@@ -31,7 +31,7 @@ export default function App() {
   }, [])
 
   return (
-    <BrowserRouter basename="/perry-directory">
+    <BrowserRouter basename={import.meta.env.VITE_BASE || '/'}>
       <div className="app">
         <header className="site-header">
           <Link className="site-brand" to="/">

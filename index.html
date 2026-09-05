@@ -8,6 +8,16 @@
       content="A directory of local businesses in Perry, Georgia. Find restaurants, home services, medical care, retail, and more."
     />
     <title>Perry Business Directory</title>
+    <script>
+      // GitHub Pages SPA fallback, restore half: 404.html stashes the attempted
+      // deep link in sessionStorage; we restore it before the router boots.
+      // Harmless on the droplet deploy (nothing ever sets ghp-redirect there).
+      var r = sessionStorage.getItem('ghp-redirect')
+      if (r) {
+        sessionStorage.removeItem('ghp-redirect')
+        history.replaceState(null, '', r)
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

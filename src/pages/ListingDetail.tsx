@@ -28,7 +28,7 @@ export function ListingDetail() {
     <div className="page">
       {listing.image && (
         <div className="detail-logo">
-          <img src={listing.image} alt={`${listing.business_name} logo`} />
+          <img src={import.meta.env.BASE_URL + listing.image.replace(/^\//, '')} alt={`${listing.business_name} logo`} />
         </div>
       )}
       <h1 className="page-title">{listing.business_name}</h1>

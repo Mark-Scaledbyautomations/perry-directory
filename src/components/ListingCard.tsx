@@ -45,7 +45,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
     <div className="listing-card">
       {listing.image && (
         <div className="listing-logo">
-          <img src={listing.image} alt={`${listing.business_name} logo`} loading="lazy" />
+          <img src={import.meta.env.BASE_URL + listing.image.replace(/^\//, '')} alt={`${listing.business_name} logo`} loading="lazy" />
         </div>
       )}
       <div className="listing-card-head">
