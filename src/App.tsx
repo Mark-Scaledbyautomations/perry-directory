@@ -31,7 +31,7 @@ export default function App() {
   }, [])
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/perry-directory">
       <div className="app">
         <header className="site-header">
           <Link className="site-brand" to="/">
