@@ -304,9 +304,14 @@ body {
   color: #b3261e;
 }
 
-.badge-website-repurposed {
+.badge-website-domain-lost {
   background: #fff4e0;
   color: #8a5a00;
+}
+
+.badge-website-rebranded {
+  background: #fbefff;
+  color: #8250df;
 }
 
 .detail-list {

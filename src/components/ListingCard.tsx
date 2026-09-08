@@ -31,7 +31,8 @@ const SCOPE_LABEL: Record<Listing['listing_scope'], string> = {
 
 const WEBSITE_STATUS_LABEL: Record<string, string> = {
   broken: 'Site broken',
-  repurposed: 'Site repurposed',
+  'domain-lost': 'Domain no longer owned',
+  rebranded: 'Rebranded',
 }
 
 export function ListingCard({ listing }: { listing: Listing }) {

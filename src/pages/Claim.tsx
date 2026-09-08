@@ -150,11 +150,18 @@ export function Claim() {
               not be working. Once done claiming this listing, we can help you
               get it fixed.
             </span>
+          ) : listing.website_status === 'domain-lost' ? (
+            <span>
+              We noticed that the website we have on file for your business no
+              longer belongs to you. Someone else now owns that address. Once
+              done claiming this listing, we can help you sort out the domain
+              and get your website pointing back to you.
+            </span>
           ) : (
             <span>
-              We noticed that the website we have on file for your business may
-              not be showing your business. Once done claiming this listing, we
-              can help you correct it.
+              We noticed that the website we have on file for your business
+              still shows your old name. Once done claiming this listing, we
+              can help you update it to your new name.
             </span>
           )}
         </div>
