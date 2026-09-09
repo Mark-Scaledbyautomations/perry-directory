@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import type { Listing } from '../data/listings'
 import { categoryBySlug } from '../data/categories'
 import { CopyPhone } from './CopyPhone'
+import { DescriptionBlock } from './DescriptionBlock'
 
 // Admin-only scope badge. The app has no login, so "admin" is a hidden URL
 // flag (?admin=1). A normal visitor never sees the badge; we do by adding the
@@ -23,13 +24,13 @@ export function isAdminMode(searchParams: { get(name: string): string | null }):
   return sessionStorage.getItem(ADMIN_KEY) === '1'
 }
 
-const SCOPE_LABEL: Record<Listing['listing_scope'], string> = {
+export const SCOPE_LABEL: Record<Listing['listing_scope'], string> = {
   'local-independent': 'Local',
   'local-franchisee': 'Franchisee',
   'corporate-location': 'Corporate',
 }
 
-const WEBSITE_STATUS_LABEL: Record<string, string> = {
+export const WEBSITE_STATUS_LABEL: Record<string, string> = {
   broken: 'Site broken',
   'domain-lost': 'Domain no longer owned',
   rebranded: 'Rebranded',
@@ -75,9 +76,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
       </p>
       {listing.description && (
         <>
-          <p className={`listing-desc${expanded ? ' is-expanded' : ''}`}>
-            {listing.description}
-          </p>
+          <DescriptionBlock text={listing.description} expanded={expanded} />
           {hasLongDesc && (
             <button
               className="see-more"

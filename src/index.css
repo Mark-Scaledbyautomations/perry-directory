@@ -103,6 +103,14 @@ body {
   margin: 16px 0;
 }
 
+.admin-toolbar {
+  margin-top: -8px;
+  padding: 10px 12px;
+  background: var(--accent-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
 .search-bar,
 .category-filter,
 .field input,
@@ -222,6 +230,66 @@ body {
 .listing-desc.is-expanded {
   -webkit-line-clamp: unset;
   overflow: visible;
+}
+
+/* AEO-structured descriptions: parsed into headings, bullets, and Q/A lines.
+   The -webkit-line-clamp above does not work on multi-block content, so the
+   AEO block uses a max-height clamp instead. A fade-out mask makes the cut
+   graceful (text fades instead of stopping mid-line), so the "See more"
+   button reads as a reveal, not a repair. */
+.listing-desc-aeo {
+  display: block;
+  -webkit-line-clamp: unset;
+  white-space: normal;
+  max-height: 200px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
+
+.listing-desc-aeo.is-expanded {
+  max-height: none;
+  overflow: visible;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.aeo-opening,
+.aeo-summary {
+  margin: 0 0 8px 0;
+}
+
+.aeo-heading {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 10px 0 4px 0;
+  color: var(--ink);
+}
+
+.aeo-list {
+  margin: 0 0 8px 0;
+  padding-left: 18px;
+}
+
+.aeo-list li {
+  margin: 2px 0;
+}
+
+.aeo-faq {
+  margin: 0 0 8px 0;
+}
+
+.aeo-qa {
+  margin: 4px 0;
+}
+
+.aeo-qa dt {
+  font-weight: 600;
+}
+
+.aeo-qa dd {
+  margin: 0 0 4px 0;
+  color: var(--muted);
 }
 
 .see-more {
@@ -568,6 +636,55 @@ fieldset.field legend {
 .pricing-note {
   font-size: 13px;
   color: var(--accent);
+  margin: 8px 0 0 0;
+}
+
+.coupon-row {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 8px 0;
+}
+
+.coupon-input {
+  flex: 1;
+  max-width: 240px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.coupon-apply {
+  padding: 8px 16px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.coupon-apply:hover {
+  background: #0550ae;
+}
+
+.coupon-error {
+  font-size: 13px;
+  color: #b3261e;
+  margin: 0 0 8px 0;
+}
+
+.coupon-success {
+  font-size: 13px;
+  color: #116329;
+  margin: 0 0 8px 0;
+}
+
+.pricing-founding {
+  font-size: 13px;
+  color: #116329;
+  font-weight: 600;
   margin: 8px 0 0 0;
 }
 

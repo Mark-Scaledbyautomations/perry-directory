@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { LISTINGS } from '../data/listings'
 import { categoryBySlug } from '../data/categories'
 import { CopyPhone } from '../components/CopyPhone'
+import { DescriptionBlock } from '../components/DescriptionBlock'
 
 export function ListingDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -36,9 +37,7 @@ export function ListingDetail() {
         {category ? category.name : listing.category_slug}
         {listing.subcategory ? ` · ${listing.subcategory}` : ''}
       </p>
-      <p className={`listing-desc${descExpanded ? ' is-expanded' : ''}`}>
-        {listing.description}
-      </p>
+      <DescriptionBlock text={listing.description} expanded={descExpanded} />
       {hasLongDesc && (
         <button
           className="see-more"

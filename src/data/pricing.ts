@@ -7,7 +7,16 @@ export interface PricingTier {
   wasPrice: string
   period: string
   monthlyNote?: string
+  // The founding-member discounted price, shown only when a valid coupon is
+  // applied. Present on Premium only. This is a display value, not a payment
+  // gate: the real price is enforced at the payment link (Phase 3).
+  foundingPrice?: string
 }
+
+// The founding-member coupon code. PLACEHOLDER: this is a clearly-marked
+// stand-in, trivial to change later (likely to match the final brand name,
+// which is also still a placeholder). Swap this one string in one pass.
+export const FOUNDING_COUPON_CODE = 'FOUNDERS'
 
 export const PRICING_TIERS: PricingTier[] = [
   {
@@ -28,6 +37,7 @@ export const PRICING_TIERS: PricingTier[] = [
     price: '$699',
     wasPrice: '',
     period: 'per year',
+    foundingPrice: '$249',
   },
   {
     name: 'Managed Growth Package',
