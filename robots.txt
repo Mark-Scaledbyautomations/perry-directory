@@ -1,6 +1,6 @@
 # INDEXING GATE (Tina 2026-08-21): keep Disallow until the directory is ready
 # to be indexed. The reference build holds indexing until 200 businesses have
-# real pictures; we have 139 logos, so we are short of that gate.
+# real pictures; we have 138 logos, so we are short of that gate.
 # When the gate is met: change to "Allow: /" and uncomment the Sitemap line.
 User-agent: *
 Disallow: /
