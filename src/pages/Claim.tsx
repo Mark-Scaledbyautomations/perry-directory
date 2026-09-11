@@ -157,6 +157,13 @@ export function Claim() {
               done claiming this listing, we can help you sort out the domain
               and get your website pointing back to you.
             </span>
+          ) : listing.website_status === 'platform-link' ? (
+            <span>
+              We noticed that the link we have on file for your business points
+              to a third-party platform (like Facebook or a reservation site)
+              rather than your own website. Once done claiming this listing, we
+              can help you add your real website.
+            </span>
           ) : (
             <span>
               We noticed that the website we have on file for your business

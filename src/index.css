@@ -382,6 +382,21 @@ body {
   color: #8250df;
 }
 
+.badge-website-platform-link {
+  background: #e7f0fe;
+  color: #1a56db;
+}
+
+.badge-desc-aeo {
+  background: #dafbe1;
+  color: #1a7f37;
+}
+
+.badge-desc-plain {
+  background: #f3f4f6;
+  color: var(--muted);
+}
+
 .detail-list {
   margin: 16px 0;
 }

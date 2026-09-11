@@ -4,13 +4,15 @@ import { LISTINGS } from '../data/listings'
 import { categoryBySlug } from '../data/categories'
 import { SearchBar } from '../components/SearchBar'
 import { CategoryFilter } from '../components/CategoryFilter'
-import { ListingCard, isAdminMode, SCOPE_LABEL, WEBSITE_STATUS_LABEL } from '../components/ListingCard'
+import { ListingCard, isAdminMode, SCOPE_LABEL, WEBSITE_STATUS_LABEL, DESCRIPTION_TYPE_LABEL } from '../components/ListingCard'
+import { isAeoDescription } from '../components/DescriptionBlock'
 
 export function Home() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('')
   const [scope, setScope] = useState('')
   const [websiteStatus, setWebsiteStatus] = useState('')
+  const [descType, setDescType] = useState('')
   const [searchParams] = useSearchParams()
   const isAdmin = isAdminMode(searchParams)
 
@@ -20,6 +22,11 @@ export function Home() {
       if (category && l.category_slug !== category) return false
       if (scope && l.listing_scope !== scope) return false
       if (websiteStatus && l.website_status !== websiteStatus) return false
+      if (descType && l.description) {
+        const isAeo = isAeoDescription(l.description)
+        if (descType === 'aeo' && !isAeo) return false
+        if (descType === 'plain' && isAeo) return false
+      }
       if (!q) return true
       const catName = (categoryBySlug(l.category_slug)?.name || '').toLowerCase()
       return (
@@ -29,7 +36,7 @@ export function Home() {
         l.subcategory.toLowerCase().includes(q)
       )
     })
-  }, [query, category, scope, websiteStatus])
+  }, [query, category, scope, websiteStatus, descType])
 
   return (
     <div className="page">
@@ -60,6 +67,17 @@ export function Home() {
             <option value="broken">{WEBSITE_STATUS_LABEL.broken}</option>
             <option value="domain-lost">{WEBSITE_STATUS_LABEL['domain-lost']}</option>
             <option value="rebranded">{WEBSITE_STATUS_LABEL.rebranded}</option>
+            <option value="platform-link">{WEBSITE_STATUS_LABEL['platform-link']}</option>
+          </select>
+          <select
+            className="category-filter"
+            value={descType}
+            onChange={(e) => setDescType(e.target.value)}
+            aria-label="Filter by description type"
+          >
+            <option value="">All description types</option>
+            <option value="aeo">{DESCRIPTION_TYPE_LABEL.aeo}</option>
+            <option value="plain">{DESCRIPTION_TYPE_LABEL.plain}</option>
           </select>
         </div>
       )}

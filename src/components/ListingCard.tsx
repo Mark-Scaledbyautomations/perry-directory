@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import type { Listing } from '../data/listings'
 import { categoryBySlug } from '../data/categories'
 import { CopyPhone } from './CopyPhone'
-import { DescriptionBlock } from './DescriptionBlock'
+import { DescriptionBlock, isAeoDescription } from './DescriptionBlock'
 
 // Admin-only scope badge. The app has no login, so "admin" is a hidden URL
 // flag (?admin=1). A normal visitor never sees the badge; we do by adding the
@@ -34,6 +34,12 @@ export const WEBSITE_STATUS_LABEL: Record<string, string> = {
   broken: 'Site broken',
   'domain-lost': 'Domain no longer owned',
   rebranded: 'Rebranded',
+  'platform-link': 'Platform link',
+}
+
+export const DESCRIPTION_TYPE_LABEL: Record<string, string> = {
+  aeo: 'AEO-structured',
+  plain: 'Plain',
 }
 
 export function ListingCard({ listing }: { listing: Listing }) {
@@ -67,6 +73,11 @@ export function ListingCard({ listing }: { listing: Listing }) {
         {isAdmin && listing.website_status && (
           <span className={`badge badge-website badge-website-${listing.website_status}`}>
             {WEBSITE_STATUS_LABEL[listing.website_status]}
+          </span>
+        )}
+        {isAdmin && listing.description && (
+          <span className={`badge badge-desc badge-desc-${isAeoDescription(listing.description) ? 'aeo' : 'plain'}`}>
+            {isAeoDescription(listing.description) ? DESCRIPTION_TYPE_LABEL.aeo : DESCRIPTION_TYPE_LABEL.plain}
           </span>
         )}
       </div>

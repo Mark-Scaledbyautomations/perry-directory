@@ -10,7 +10,7 @@
 
 const HEADINGS = ['Services', 'FAQ', 'Summary']
 
-function isAeo(text: string): boolean {
+export function isAeoDescription(text: string): boolean {
   return HEADINGS.every((h) => text.split('\n').some((l) => l.trim() === h))
 }
 
@@ -19,7 +19,7 @@ export function DescriptionBlock({ text, expanded }: { text: string; expanded: b
 
   const clampClass = expanded ? ' is-expanded' : ''
 
-  if (!isAeo(text)) {
+  if (!isAeoDescription(text)) {
     return <p className={`listing-desc${clampClass}`}>{text}</p>
   }
 
