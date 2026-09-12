@@ -7,6 +7,12 @@ import { CategoryFilter } from '../components/CategoryFilter'
 import { ListingCard, isAdminMode, SCOPE_LABEL, WEBSITE_STATUS_LABEL, DESCRIPTION_TYPE_LABEL } from '../components/ListingCard'
 import { isAeoDescription } from '../components/DescriptionBlock'
 
+// Crude plural/agent stem so "plumber" matches "Plumbing" and "restaurants"
+// matches "restaurant". Strips the common trailing suffixes once.
+function stem(word: string): string {
+  return word.replace(/(er|ers|or|ors|ing|ings|s|es)$/, '')
+}
+
 export function Home() {
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('')
@@ -21,20 +27,23 @@ export function Home() {
     return LISTINGS.filter((l) => {
       if (category && l.category_slug !== category) return false
       if (scope && l.listing_scope !== scope) return false
-      if (websiteStatus && l.website_status !== websiteStatus) return false
-      if (descType && l.description) {
-        const isAeo = isAeoDescription(l.description)
+      if (websiteStatus === 'none') {
+        if (l.website) return false
+      } else if (websiteStatus === 'ok') {
+        if (!l.website || l.website_status) return false
+      } else if (websiteStatus && l.website_status !== websiteStatus) return false
+      if (descType) {
+        const isAeo = l.description ? isAeoDescription(l.description) : false
         if (descType === 'aeo' && !isAeo) return false
         if (descType === 'plain' && isAeo) return false
       }
       if (!q) return true
       const catName = (categoryBySlug(l.category_slug)?.name || '').toLowerCase()
-      return (
-        l.business_name.toLowerCase().includes(q) ||
-        l.category_slug.toLowerCase().includes(q) ||
-        catName.includes(q) ||
-        l.subcategory.toLowerCase().includes(q)
-      )
+      const haystack = `${l.business_name} ${l.category_slug} ${catName} ${l.subcategory}`.toLowerCase()
+      return q
+        .split(/[^a-z0-9]+/)
+        .filter(Boolean)
+        .every((w) => haystack.includes(w) || haystack.includes(stem(w)))
     })
   }, [query, category, scope, websiteStatus, descType])
 
@@ -54,6 +63,7 @@ export function Home() {
             aria-label="Filter by listing scope"
           >
             <option value="">All scopes</option>
+            <option value="local-independent">{SCOPE_LABEL['local-independent']}</option>
             <option value="local-franchisee">{SCOPE_LABEL['local-franchisee']}</option>
             <option value="corporate-location">{SCOPE_LABEL['corporate-location']}</option>
           </select>
@@ -64,6 +74,8 @@ export function Home() {
             aria-label="Filter by website status"
           >
             <option value="">All website statuses</option>
+            <option value="ok">Site OK</option>
+            <option value="none">No website</option>
             <option value="broken">{WEBSITE_STATUS_LABEL.broken}</option>
             <option value="domain-lost">{WEBSITE_STATUS_LABEL['domain-lost']}</option>
             <option value="rebranded">{WEBSITE_STATUS_LABEL.rebranded}</option>

@@ -9,6 +9,7 @@ import { AddBusiness } from './pages/AddBusiness'
 import { Terms } from './pages/Terms'
 import { Privacy } from './pages/Privacy'
 import { ClaimHelp } from './pages/ClaimHelp'
+import { ChatBot } from './components/ChatBot'
 
 function SiteFooter() {
   const location = useLocation()
@@ -58,6 +59,7 @@ export default function App() {
         </main>
 
         <SiteFooter />
+        <ChatBot />
       </div>
     </BrowserRouter>
   )
