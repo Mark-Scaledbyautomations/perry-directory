@@ -7,10 +7,38 @@ import { CategoryFilter } from '../components/CategoryFilter'
 import { ListingCard, isAdminMode, SCOPE_LABEL, WEBSITE_STATUS_LABEL, DESCRIPTION_TYPE_LABEL } from '../components/ListingCard'
 import { isAeoDescription } from '../components/DescriptionBlock'
 
-// Crude plural/agent stem so "plumber" matches "Plumbing" and "restaurants"
-// matches "restaurant". Strips the common trailing suffixes once.
-function stem(word: string): string {
-  return word.replace(/(er|ers|or|ors|ing|ings|s|es)$/, '')
+// Crude plural/agent stems so "plumber" matches "Plumbing" and "restaurants"
+// matches "restaurant". Returns the word plus each plausible stem (agent
+// suffix "plumber" -> "plumb", plural "plumbers" -> "plumber"), so the matcher
+// can accept any of them. Guarded so a short word ("s", "es", "llc") never
+// stems to an empty string, which would match every listing.
+function stems(word: string): string[] {
+  if (word.length <= 2) return [word]
+  const out = [word]
+  for (const suf of ['ers', 'ors', 'er', 'or', 'ings', 'ing', 'es', 's']) {
+    if (word.endsWith(suf)) {
+      const cand = word.slice(0, word.length - suf.length)
+      if (cand.length >= 2 && !out.includes(cand)) out.push(cand)
+      break // strip one suffix class only: "plumber" -> "plumb", not "plumbe"
+    }
+  }
+  return out
+}
+
+// Words a visitor types that carry no search meaning on their own. Without
+// this, "the" matches 19 listings (substring inside "Theatre") and "of"
+// matches 127, which reads as an inaccurate count. These are matched as whole
+// words only in names, so excluding them from the query loses nothing.
+const STOP_WORDS = new Set([
+  'a', 'an', 'the', 'and', 'or', 'of', 'in', 'on', 'at', 'to', 'for',
+  'is', 'it', 'by', 'with', 'near', 'me', 'my', 'i', 'we',
+])
+
+// Split a string into lowercase word tokens (letters/digits only), so matching
+// happens on word boundaries instead of raw substrings. This stops "tire" from
+// matching "Retirement" and "the" from matching "Theatre".
+function tokens(text: string): string[] {
+  return text.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)
 }
 
 export function Home() {
@@ -39,11 +67,25 @@ export function Home() {
       }
       if (!q) return true
       const catName = (categoryBySlug(l.category_slug)?.name || '').toLowerCase()
-      const haystack = `${l.business_name} ${l.category_slug} ${catName} ${l.subcategory}`.toLowerCase()
-      return q
+      // Tokenize the haystack on word boundaries so a query word has to match a
+      // whole field word, not a substring inside an unrelated word ("tire" in
+      // "Retirement").
+      const hayTokens = tokens(`${l.business_name} ${l.category_slug} ${catName} ${l.subcategory}`)
+      // Query words: drop stop words. If the query is ALL stop words ("the"),
+      // treat it as no-query rather than matching everything or nothing.
+      const words = q
         .split(/[^a-z0-9]+/)
         .filter(Boolean)
-        .every((w) => haystack.includes(w) || haystack.includes(stem(w)))
+        .filter((w) => !STOP_WORDS.has(w))
+      if (words.length === 0) return true
+      return words.every((w) =>
+        hayTokens.some(
+          (t) =>
+            stems(w).some((s) => t === s || (s.length >= 4 && t.startsWith(s))) ||
+            // Prefix match on the raw query too, so "dent" finds "dental".
+            (w.length >= 4 && t.startsWith(w)),
+        ),
+      )
     })
   }, [query, category, scope, websiteStatus, descType])
 
