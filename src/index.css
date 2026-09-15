@@ -146,6 +146,44 @@ body {
   flex: 1;
 }
 
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.active-filters-lead {
+  margin-right: 2px;
+}
+
+.active-chip {
+  padding: 3px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--accent-soft, #eef4ff);
+  color: var(--ink);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.active-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.active-clear-all {
+  border: none;
+  background: none;
+  color: var(--accent);
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .result-count {
   color: var(--muted);
   font-size: 14px;

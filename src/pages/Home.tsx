@@ -41,27 +41,73 @@ function tokens(text: string): string[] {
   return text.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)
 }
 
+// All four filter values live in the URL (category, scope, website status,
+// description type) plus the search box. Reading them from `?...=` on every
+// render and writing changes back to the URL keeps the dropdowns, the count,
+// and the address bar in lockstep, and makes refresh / back-forward / deep
+// link behave identically. Before this, scope/status/desc were local state:
+// silent, invisible, and still active after interactions, so combined counts
+// read as "inaccurate" until a full refresh reset them.
+function UrlFilter(props: { name: string; value: string; onChange: (v: string) => void; labels: [string, string][]; aria: string }) {
+  return (
+    <select
+      className="category-filter"
+      value={props.value}
+      onChange={(e) => props.onChange(e.target.value)}
+      aria-label={props.aria}
+    >
+      {props.labels.map(([val, label]) => (
+        <option key={val} value={val}>{label}</option>
+      ))}
+    </select>
+  )
+}
+
 export function Home() {
   const [searchParams, setSearchParams] = useSearchParams()
   const isAdmin = isAdminMode(searchParams)
   const [query, setQuery] = useState('')
-  // Category is URL-driven, not local state. Reading it from `?category=` via
-  // useState only ran once on mount, so clicking a category deep link (or the
-  // header "Directory" link) while already on /directory reused the same
-  // component and kept the OLD category. That made the filter dropdown and the
-  // count disagree (a stale filtered subset showing under a different label).
-  // Deriving the value from the URL on every render, and writing changes back
-  // to the URL, keeps the dropdown, the count, and the address bar in lockstep.
-  const category = searchParams.get('category') || ''
-  const setCategory = (next: string) => {
-    const p = new URLSearchParams(searchParams)
-    if (next) p.set('category', next)
-    else p.delete('category')
+
+  // URL-driven filter helpers. The update reads window.location.search at the
+  // moment of the change, not the `searchParams` snapshot captured at render.
+  // Two dropdown changes fired before React re-renders otherwise race: the
+  // second overwrite drops the first's param (functional setSearchParams in
+  // react-router v7 can still receive the same base when both calls resolve
+  // into one navigation batch). That silently un-set a filter while others
+  // stayed -- the exact "inaccurate until refresh" symptom. Reading the live
+  // location makes each change start from the latest true state.
+  const setParams = (updates: Record<string, string>) => {
+    const p = new URLSearchParams(window.location.search)
+    for (const [k, v] of Object.entries(updates)) {
+      if (v) p.set(k, v)
+      else p.delete(k)
+    }
     setSearchParams(p, { replace: true })
   }
-  const [scope, setScope] = useState('')
-  const [websiteStatus, setWebsiteStatus] = useState('')
-  const [descType, setDescType] = useState('')
+
+  const category = searchParams.get('category') || ''
+  const scope = searchParams.get('scope') || ''
+  const websiteStatus = searchParams.get('status') || ''
+  const descType = searchParams.get('desc') || ''
+
+  const setCategory = (next: string) => setParams({ category: next })
+  const setScope = (next: string) => setParams({ scope: next })
+  const setWebsiteStatus = (next: string) => setParams({ status: next })
+  const setDescType = (next: string) => setParams({ desc: next })
+
+  // Which non-category filters are currently active (for chips + count text).
+  const activeFilters: { label: string; clear: () => void }[] = []
+  if (category) activeFilters.push({ label: categoryBySlug(category)?.name || category, clear: () => setCategory('') })
+  if (scope) activeFilters.push({ label: SCOPE_LABEL[scope as keyof typeof SCOPE_LABEL], clear: () => setScope('') })
+  if (websiteStatus) {
+    const label =
+      websiteStatus === 'ok' ? 'Site OK'
+      : websiteStatus === 'none' ? 'No website'
+      : WEBSITE_STATUS_LABEL[websiteStatus] || websiteStatus
+    activeFilters.push({ label, clear: () => setWebsiteStatus('') })
+  }
+  if (descType) activeFilters.push({ label: DESCRIPTION_TYPE_LABEL[descType], clear: () => setDescType('') })
+  const clearAll = () => setParams({ category: '', scope: '', status: '', desc: '' })
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -121,41 +167,62 @@ export function Home() {
       </div>
       {isAdmin && (
         <div className="toolbar admin-toolbar">
-          <select
-            className="category-filter"
+          <UrlFilter
+            name="scope"
             value={scope}
-            onChange={(e) => setScope(e.target.value)}
-            aria-label="Filter by listing scope"
-          >
-            <option value="">All scopes</option>
-            <option value="local-independent">{SCOPE_LABEL['local-independent']}</option>
-            <option value="local-franchisee">{SCOPE_LABEL['local-franchisee']}</option>
-            <option value="corporate-location">{SCOPE_LABEL['corporate-location']}</option>
-          </select>
-          <select
-            className="category-filter"
+            onChange={setScope}
+            aria="Filter by listing scope"
+            labels={[
+              ['', 'All scopes'],
+              ['local-independent', SCOPE_LABEL['local-independent']],
+              ['local-franchisee', SCOPE_LABEL['local-franchisee']],
+              ['corporate-location', SCOPE_LABEL['corporate-location']],
+            ]}
+          />
+          <UrlFilter
+            name="status"
             value={websiteStatus}
-            onChange={(e) => setWebsiteStatus(e.target.value)}
-            aria-label="Filter by website status"
-          >
-            <option value="">All website statuses</option>
-            <option value="ok">Site OK</option>
-            <option value="none">No website</option>
-            <option value="broken">{WEBSITE_STATUS_LABEL.broken}</option>
-            <option value="domain-lost">{WEBSITE_STATUS_LABEL['domain-lost']}</option>
-            <option value="rebranded">{WEBSITE_STATUS_LABEL.rebranded}</option>
-            <option value="platform-link">{WEBSITE_STATUS_LABEL['platform-link']}</option>
-          </select>
-          <select
-            className="category-filter"
+            onChange={setWebsiteStatus}
+            aria="Filter by website status"
+            labels={[
+              ['', 'All website statuses'],
+              ['ok', 'Site OK'],
+              ['none', 'No website'],
+              ['broken', WEBSITE_STATUS_LABEL.broken],
+              ['domain-lost', WEBSITE_STATUS_LABEL['domain-lost']],
+              ['rebranded', WEBSITE_STATUS_LABEL.rebranded],
+              ['platform-link', WEBSITE_STATUS_LABEL['platform-link']],
+            ]}
+          />
+          <UrlFilter
+            name="desc"
             value={descType}
-            onChange={(e) => setDescType(e.target.value)}
-            aria-label="Filter by description type"
-          >
-            <option value="">All description types</option>
-            <option value="aeo">{DESCRIPTION_TYPE_LABEL.aeo}</option>
-            <option value="plain">{DESCRIPTION_TYPE_LABEL.plain}</option>
-          </select>
+            onChange={setDescType}
+            aria="Filter by description type"
+            labels={[
+              ['', 'All description types'],
+              ['aeo', DESCRIPTION_TYPE_LABEL.aeo],
+              ['plain', DESCRIPTION_TYPE_LABEL.plain],
+            ]}
+          />
+        </div>
+      )}
+      {(activeFilters.length > 0 || query) && (
+        <div className="active-filters" role="status">
+          <span className="active-filters-lead">Showing results for:</span>
+          {activeFilters.map((f) => (
+            <button key={f.label} className="active-chip" type="button" onClick={f.clear} title="Clear this filter">
+              {f.label} ×
+            </button>
+          ))}
+          {query && (
+            <button className="active-chip" type="button" onClick={() => setQuery('')} title="Clear search">
+              "{query}" ×
+            </button>
+          )}
+          <button className="active-clear-all" type="button" onClick={() => { clearAll(); setQuery('') }}>
+            Clear all
+          </button>
         </div>
       )}
       <p className="result-count">{results.length} listing(s)</p>
