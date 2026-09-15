@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Link, useLocation, useSearchParams } from 'react-router-dom'
 import { BRAND_NAME } from './data/brand'
+import { isAdminMode } from './components/ListingCard'
 import { Landing } from './pages/Landing'
 import { Home } from './pages/Home'
 import { ListingDetail } from './pages/ListingDetail'
@@ -11,6 +12,18 @@ import { Terms } from './pages/Terms'
 import { Privacy } from './pages/Privacy'
 import { ClaimHelp } from './pages/ClaimHelp'
 import { ChatBot } from './components/ChatBot'
+
+// Pins the hidden ?admin=1 review flag to sessionStorage on ANY entry page.
+// Admin mode used to be detected only on the directory grid (Home), so it
+// worked while / was the grid. Now / is the Landing page, which never read
+// the flag, so landing on /?admin=1 and then clicking "Directory" dropped it
+// and showed the visitor view. Reading it here, inside the router, keeps the
+// flag sticky for the whole tab no matter which page you enter on.
+function AdminFlagSync() {
+  const [searchParams] = useSearchParams()
+  isAdminMode(searchParams)
+  return null
+}
 
 function SiteFooter() {
   const location = useLocation()
@@ -34,6 +47,7 @@ export default function App() {
 
   return (
     <BrowserRouter basename={import.meta.env.VITE_BASE || '/'}>
+      <AdminFlagSync />
       <div className="app">
         <header className="site-header">
           <Link className="site-brand" to="/">
