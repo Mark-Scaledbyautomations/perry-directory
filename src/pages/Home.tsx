@@ -42,13 +42,13 @@ function tokens(text: string): string[] {
 }
 
 export function Home() {
+  const [searchParams] = useSearchParams()
+  const isAdmin = isAdminMode(searchParams)
   const [query, setQuery] = useState('')
-  const [category, setCategory] = useState('')
+  const [category, setCategory] = useState(searchParams.get('category') || '')
   const [scope, setScope] = useState('')
   const [websiteStatus, setWebsiteStatus] = useState('')
   const [descType, setDescType] = useState('')
-  const [searchParams] = useSearchParams()
-  const isAdmin = isAdminMode(searchParams)
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()

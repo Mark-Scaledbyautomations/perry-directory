@@ -17,7 +17,7 @@ export function ListingDetail() {
       <div className="page">
         <h1 className="page-title">Listing not found</h1>
         <p>
-          <Link to="/">Back to the directory</Link>
+          <Link to="/directory">Back to the directory</Link>
         </p>
       </div>
     )

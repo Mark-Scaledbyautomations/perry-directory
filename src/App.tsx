@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom'
 import { BRAND_NAME } from './data/brand'
+import { Landing } from './pages/Landing'
 import { Home } from './pages/Home'
 import { ListingDetail } from './pages/ListingDetail'
 import { Claim } from './pages/Claim'
@@ -39,7 +40,7 @@ export default function App() {
             {BRAND_NAME}
           </Link>
           <nav className="site-nav">
-            <Link to="/">Directory</Link>
+            <Link to="/directory">Directory</Link>
             <Link to="/pricing">Pricing</Link>
             <Link to="/add">Add a business</Link>
           </nav>
@@ -47,7 +48,8 @@ export default function App() {
 
         <main className="site-main">
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Landing />} />
+            <Route path="/directory" element={<Home />} />
             <Route path="/listing/:slug" element={<ListingDetail />} />
             <Route path="/claim/:slug" element={<Claim />} />
             <Route path="/pricing" element={<Pricing />} />
