@@ -42,10 +42,23 @@ function tokens(text: string): string[] {
 }
 
 export function Home() {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const isAdmin = isAdminMode(searchParams)
   const [query, setQuery] = useState('')
-  const [category, setCategory] = useState(searchParams.get('category') || '')
+  // Category is URL-driven, not local state. Reading it from `?category=` via
+  // useState only ran once on mount, so clicking a category deep link (or the
+  // header "Directory" link) while already on /directory reused the same
+  // component and kept the OLD category. That made the filter dropdown and the
+  // count disagree (a stale filtered subset showing under a different label).
+  // Deriving the value from the URL on every render, and writing changes back
+  // to the URL, keeps the dropdown, the count, and the address bar in lockstep.
+  const category = searchParams.get('category') || ''
+  const setCategory = (next: string) => {
+    const p = new URLSearchParams(searchParams)
+    if (next) p.set('category', next)
+    else p.delete('category')
+    setSearchParams(p, { replace: true })
+  }
   const [scope, setScope] = useState('')
   const [websiteStatus, setWebsiteStatus] = useState('')
   const [descType, setDescType] = useState('')
