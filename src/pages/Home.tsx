@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { LISTINGS } from '../data/listings'
 import { categoryBySlug } from '../data/categories'
 import { SearchBar } from '../components/SearchBar'
@@ -92,6 +92,16 @@ export function Home() {
   return (
     <div className="page">
       <h1 className="page-title">Find a business in Perry</h1>
+      {isAdmin && (
+        <div className="admin-banner" role="status">
+          <span>
+            <strong>Admin mode</strong>: review filters and badges are visible.
+          </span>
+          <Link className="admin-exit" to="/directory?admin=0">
+            Exit admin mode
+          </Link>
+        </div>
+      )}
       <div className="toolbar">
         <SearchBar value={query} onChange={setQuery} />
         <CategoryFilter value={category} onChange={setCategory} />
