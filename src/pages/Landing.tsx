@@ -1,21 +1,45 @@
 import { Link } from 'react-router-dom'
 import { LISTINGS } from '../data/listings'
 import { CATEGORIES } from '../data/categories'
-import { BRAND_CITY, BRAND_STATE } from '../data/brand'
+import { BRAND_CITY, BRAND_STATE_FULL } from '../data/brand'
 
 // Landing page (UI buildout piece a). Port of the OpenDesign "Quiet Local"
-// artifact (research/ui-buildout-od-2026-09-15/) into the app shell.
-// Stats are derived from LISTINGS at render so they stay true when data or
-// photos change. Copy is placeholder-marked pending brand decisions.
+// artifact (research/ui-buildout-od-2026-09-15/) into the app shell, refined
+// 2026-09-16 (OpenDesign run): "Perry, Georgia" wording + "Real local
+// businesses" anchor band. Stats are derived from LISTINGS at render so they
+// stay true when data or photos change. Copy is placeholder-marked pending
+// brand decisions.
 const totalListings = LISTINGS.length
 const photosCount = LISTINGS.filter((l) => l.image).length
 const categoryCount = CATEGORIES.length
+
+// The 8 anchor businesses in the credibility band, by slug, with the plain
+// category label shown under each name (display copy only; the underlying
+// listings supply name + logo from data). Chosen across trades so a visitor
+// can spot their own. These include national affiliates, so no copy claims
+// local ownership.
+const ANCHOR_SLUGS: { slug: string; label: string }[] = [
+  { slug: 'bodega-brew', label: 'Cafes and coffee' },
+  { slug: 'kidstrong-perry', label: 'Fitness' },
+  { slug: 'hoke-s-heating-air', label: 'Heating and air' },
+  { slug: 'cossart-design', label: 'Home and furniture' },
+  { slug: 'hamby-automotive-network', label: 'Auto repair' },
+  { slug: 'abba-house', label: 'Community nonprofit' },
+  { slug: 'kinetic', label: 'Marketing and media' },
+  { slug: 'air-evac-lifeteam', label: 'Medical transport' },
+]
+const anchors = ANCHOR_SLUGS.flatMap((a) => {
+  const l = LISTINGS.find((x) => x.slug === a.slug)
+  return l && l.image
+    ? [{ slug: l.slug, name: l.business_name, image: l.image, label: a.label }]
+    : []
+})
 
 export function Landing() {
   return (
     <div className="landing">
       <section className="landing-hero">
-        <h1>Find trusted local businesses in {BRAND_CITY}, {BRAND_STATE}.</h1>
+        <h1>Find trusted local businesses in {BRAND_CITY}, {BRAND_STATE_FULL}.</h1>
         <p className="landing-hero-sub">
           Every listing has a real street address and a phone number you can
           call today.
@@ -56,6 +80,34 @@ export function Landing() {
         </div>
       </section>
 
+      <section
+        className="landing-section"
+        aria-labelledby="landing-anchors-heading"
+      >
+        <h2 id="landing-anchors-heading">Real local businesses</h2>
+        <p className="landing-section-sub">
+          A few of the {totalListings} listings, each with a verified street
+          address and phone number.
+        </p>
+        <ul className="landing-anchor-grid">
+          {anchors.map((a) => (
+            <li key={a.slug}>
+              <Link className="landing-biz-tile" to={`/listing/${a.slug}`}>
+                <span className="landing-biz-logo">
+                  <img
+                    src={import.meta.env.BASE_URL + a.image.replace(/^\//, '')}
+                    alt={`${a.name} logo`}
+                    loading="lazy"
+                  />
+                </span>
+                <span className="landing-biz-name">{a.name}</span>
+                <span className="landing-biz-cat">{a.label}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       <section className="landing-section" aria-labelledby="landing-categories-heading">
         <h2 id="landing-categories-heading">Browse by category</h2>
         <p className="landing-section-sub">
@@ -66,7 +118,7 @@ export function Landing() {
             const count = LISTINGS.filter((l) => l.category_slug === c.slug).length
             return (
               <li key={c.slug}>
-                <Link className="landing-cat-tile" to={`/directory?category=${c.slug}`}>
+                <Link className="landing-cat-tile" to={`/category/${c.slug}`}>
                   <span className="landing-cat-name">{c.name}</span>
                   <span className="landing-cat-count">{count} businesses</span>
                 </Link>

@@ -4,6 +4,7 @@ import { BRAND_NAME } from './data/brand'
 import { isAdminMode } from './components/ListingCard'
 import { Landing } from './pages/Landing'
 import { Home } from './pages/Home'
+import { Category } from './pages/Category'
 import { ListingDetail } from './pages/ListingDetail'
 import { Claim } from './pages/Claim'
 import { Pricing } from './pages/Pricing'
@@ -25,6 +26,20 @@ function AdminFlagSync() {
   return null
 }
 
+// Tab title per route. App used to set BRAND_NAME once on mount, which ran
+// after child page effects and overwrote them (React runs child effects
+// first). This syncs on every navigation instead: pages that manage their
+// own title (Category, 2026-09-16 piece b) are skipped, everything else
+// shows the brand name, matching the previous behavior.
+function RouteTitleSync() {
+  const location = useLocation()
+  useEffect(() => {
+    if (location.pathname.startsWith('/category/')) return
+    document.title = BRAND_NAME
+  }, [location.pathname])
+  return null
+}
+
 function SiteFooter() {
   const location = useLocation()
   const from = encodeURIComponent(location.pathname)
@@ -41,13 +56,10 @@ function SiteFooter() {
 }
 
 export default function App() {
-  useEffect(() => {
-    document.title = BRAND_NAME
-  }, [])
-
   return (
     <BrowserRouter basename={import.meta.env.VITE_BASE || '/'}>
       <AdminFlagSync />
+      <RouteTitleSync />
       <div className="app">
         <header className="site-header">
           <Link className="site-brand" to="/">
@@ -64,6 +76,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/directory" element={<Home />} />
+            <Route path="/category/:slug" element={<Category />} />
             <Route path="/listing/:slug" element={<ListingDetail />} />
             <Route path="/claim/:slug" element={<Claim />} />
             <Route path="/pricing" element={<Pricing />} />
