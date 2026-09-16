@@ -35,10 +35,32 @@ const anchors = ANCHOR_SLUGS.flatMap((a) => {
     : []
 })
 
+// Category tile photos (UI, 2026-09-16). Every file depicts a real Perry or
+// Houston County location in that trade, from Wikimedia Commons, all
+// photographer Michael Rivera (courthouse image CC BY-SA 3.0, rest 4.0;
+// credit in the site footer). Stored resized under public/perry/cat/.
+// The mapping covers all 9 category slugs, so tiles always carry a photo.
+const CAT_PHOTOS: Record<string, string> = {
+  restaurants: 'restaurants.jpg', // Swanson Restaurant, Perry
+  'home-services': 'home-services.jpg', // Perry Public Safety Building
+  medical: 'medical.jpg', // Houston Medical Center, Warner Robins (county hospital)
+  legal: 'legal.jpg', // Houston County Courthouse, east face
+  auto: 'auto.jpg', // Quick Serve Gas Station, Main St
+  retail: 'retail.jpg', // Dollar General, Main St
+  fitness: 'fitness.jpg', // Perry High School football stadium
+  'professional-services': 'professional-services.jpg', // The Bank of Perry
+  nonprofits: 'nonprofits.jpg', // Perry United Methodist Church
+}
+
 export function Landing() {
   return (
     <div className="landing">
-      <section className="landing-hero">
+      <section className="landing-hero landing-hero-photo">
+        <img
+          className="landing-hero-photo-img"
+          src={`${import.meta.env.BASE_URL}perry/city-hall.jpg`}
+          alt="Perry City Hall on the historic courthouse square"
+        />
         <h1>Find trusted local businesses in {BRAND_CITY}, {BRAND_STATE_FULL}.</h1>
         <p className="landing-hero-sub">
           Every listing has a real street address and a phone number you can
@@ -80,6 +102,39 @@ export function Landing() {
         </div>
       </section>
 
+      <section className="landing-section" aria-labelledby="landing-categories-heading">
+        <h2 id="landing-categories-heading">Browse by category</h2>
+        <p className="landing-section-sub">
+          Nine categories cover all {totalListings} listings in the directory.
+        </p>
+        <ul className="landing-category-grid">
+          {CATEGORIES.map((c) => {
+            const count = LISTINGS.filter((l) => l.category_slug === c.slug).length
+            const photo = CAT_PHOTOS[c.slug]
+            return (
+              <li key={c.slug}>
+                <Link className="landing-cat-tile" to={`/category/${c.slug}`}>
+                  {photo && (
+                    <span className="landing-cat-photo">
+                      <img
+                        src={`${import.meta.env.BASE_URL}perry/cat/${photo}`}
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                      />
+                    </span>
+                  )}
+                  <span className="landing-cat-body">
+                    <span className="landing-cat-name">{c.name}</span>
+                    <span className="landing-cat-count">{count} businesses</span>
+                  </span>
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </section>
+
       <section
         className="landing-section"
         aria-labelledby="landing-anchors-heading"
@@ -105,26 +160,6 @@ export function Landing() {
               </Link>
             </li>
           ))}
-        </ul>
-      </section>
-
-      <section className="landing-section" aria-labelledby="landing-categories-heading">
-        <h2 id="landing-categories-heading">Browse by category</h2>
-        <p className="landing-section-sub">
-          Nine categories cover all {totalListings} listings in the directory.
-        </p>
-        <ul className="landing-category-grid">
-          {CATEGORIES.map((c) => {
-            const count = LISTINGS.filter((l) => l.category_slug === c.slug).length
-            return (
-              <li key={c.slug}>
-                <Link className="landing-cat-tile" to={`/category/${c.slug}`}>
-                  <span className="landing-cat-name">{c.name}</span>
-                  <span className="landing-cat-count">{count} businesses</span>
-                </Link>
-              </li>
-            )
-          })}
         </ul>
       </section>
 

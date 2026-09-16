@@ -51,6 +51,9 @@ function SiteFooter() {
         <Link to="/terms">Terms of use</Link>
         <Link to="/privacy">Privacy notice</Link>
       </nav>
+      <p className="site-footer-credits">
+        Town photos: Michael Rivera, via Wikimedia Commons (CC BY-SA).
+      </p>
     </footer>
   )
 }

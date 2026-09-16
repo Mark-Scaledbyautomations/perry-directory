@@ -5,6 +5,14 @@
   --accent-soft: #eef3fd;
   --line: #e2e7f0;
   --bg: #ffffff;
+  /* Set D "Azure Scale" (palette research 2026-09-16): one hue family in
+     depths. --accent stays #1b5bd7 for actions; --deep/--mid carry photo
+     heroes and solid bands. Contrast (computed): white on deep 13.51,
+     white on mid 10.15, white on accent 5.96, pale on deep 10.76. */
+  --deep: #0d2b66;
+  --mid: #123c8f;
+  --pale: #dbe6fb;
+  --accent-hover: #164ab3;
 }
 
 * {
@@ -1005,10 +1013,81 @@ fieldset.field legend {
 }
 
 /* Landing page (UI buildout piece a, port of the OpenDesign "Quiet Local"
-   artifact). All colors derive from the app tokens above. */
+   artifact). All colors derive from the app tokens above.
+   Set D "Azure Scale" refinement 2026-09-16: photo hero band + About Perry
+   attraction band + navy claim band. Hero photos: Wikimedia Commons,
+   CC BY-SA 4.0, photographer Michael Rivera (credit in site footer). */
 .landing-hero {
   padding: 64px 0 48px;
 }
+
+.landing-hero-photo {
+  position: relative;
+  margin: 32px 0 0;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 48px 24px 44px;
+  background: var(--deep);
+}
+
+.landing-hero-photo .landing-hero-photo-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+}
+
+.landing-hero-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(13, 43, 102, 0.45), rgba(13, 43, 102, 0.65));
+}
+
+.landing-hero-photo > * {
+  position: relative;
+  z-index: 1;
+}
+
+.landing-hero-photo .landing-btn-secondary {
+  background: transparent;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.65);
+}
+
+.landing-hero-photo .landing-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
+.landing-hero-photo h1,
+.landing-hero-photo .landing-hero-sub {
+  color: #fff;
+}
+
+.landing-hero-photo .landing-hero-sub {
+  color: var(--pale);
+}
+
+/* About Perry band (attractions) removed by Arbo 2026-09-16; section deleted
+   from Landing.tsx. The two card photos remain in public/perry/ pending a
+   possible future use. */
+
+.site-footer-credits {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 10px 0 0;
+  text-align: center;
+}
+
 
 .landing-hero h1 {
   margin: 0 0 16px;
@@ -1077,8 +1156,11 @@ fieldset.field legend {
 }
 
 .landing-stats-card {
-  background: var(--accent-soft);
-  border: 1px solid var(--line);
+  /* Set D: gradient band echoing the doc-header treatment, one blue family
+     left to right: azure accent -> mid -> deep. White/pale text; computed
+     worst-case ratios: white on #1b5bd7 5.96 (numerals, large-text AA 3:1). */
+  background: linear-gradient(90deg, var(--accent) 0%, var(--mid) 55%, var(--deep) 100%);
+  border: 1px solid var(--deep);
   border-radius: 8px;
   padding: 30px 28px 24px;
 }
@@ -1099,7 +1181,7 @@ fieldset.field legend {
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.01em;
-  color: var(--ink);
+  color: #fff; /* Set D gradient band; worst point on gradient 5.96:1 */
   font-variant-numeric: tabular-nums;
 }
 
@@ -1107,7 +1189,7 @@ fieldset.field legend {
   display: block;
   margin-top: 6px;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--pale); /* on gradient worst point 4.75:1, AA */
   line-height: 1.5;
 }
 
@@ -1115,7 +1197,8 @@ fieldset.field legend {
   margin: 20px 0 0;
   text-align: center;
   font-size: 12px;
-  color: var(--muted);
+  color: var(--pale); /* on gradient worst point 4.75:1, AA */
+  opacity: 0.9;
 }
 
 /* Anchor businesses band (Real local businesses). Ported from the
@@ -1408,17 +1491,40 @@ fieldset.field legend {
 .landing-cat-tile {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 16px 20px;
-  background: var(--accent-soft);
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #fff;
   border: 1px solid var(--line);
   border-radius: 8px;
   text-decoration: none;
-  transition: background-color 0.15s ease;
+  transition: border-color 0.15s ease;
 }
 
 .landing-cat-tile:hover {
-  background: color-mix(in oklab, var(--accent-soft) 80%, var(--accent) 20%);
+  border-color: color-mix(in oklab, var(--line) 40%, var(--accent) 60%);
+}
+
+.landing-cat-photo {
+  display: block;
+  width: 100%;
+  height: 96px;
+  background: var(--deep);
+}
+
+.landing-cat-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 45%;
+}
+
+.landing-cat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 13px 16px 15px;
 }
 
 .landing-cat-name {
@@ -1472,21 +1578,33 @@ fieldset.field legend {
 }
 
 .landing-claim-card {
-  background: var(--accent-soft);
-  border: 1px solid var(--line);
+  /* Set D: the claim moment goes solid deep navy with a reversed button,
+     so "own" reads apart from "browse" by band weight, not just hue. */
+  background: var(--deep);
+  border: 1px solid var(--deep);
   border-radius: 8px;
   padding: 38px 36px;
+}
+
+.landing-claim-card .landing-btn-primary {
+  background: #fff;
+  color: var(--mid);
+}
+
+.landing-claim-card .landing-btn-primary:hover {
+  background: var(--accent-soft);
 }
 
 .landing-claim-card h2 {
   margin: 0 0 10px;
   font-size: clamp(22px, 2vw + 14px, 26px);
   line-height: 1.3;
+  color: #fff;
 }
 
 .landing-claim-card p {
   margin: 0 0 24px;
-  color: var(--muted);
+  color: var(--pale);
   max-width: 56ch;
 }
 
