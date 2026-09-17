@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { LISTINGS } from '../data/listings'
 import { ConsentCheckbox, type ConsentState } from '../components/ConsentCheckbox'
+import { PhotoUpload, type PhotoUploadState } from '../components/PhotoUpload'
 import {
   RELATIONSHIP_OPTIONS,
   VERIFICATION_METHOD_OPTIONS,
@@ -23,6 +24,10 @@ export function Claim() {
     email: false,
     sms: false,
     voice: false,
+  })
+  const [photo, setPhoto] = useState<PhotoUploadState>({
+    fileName: null,
+    licenseAccepted: false,
   })
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -126,6 +131,8 @@ export function Claim() {
           ))}
         </fieldset>
 
+        <PhotoUpload value={photo} onChange={setPhoto} />
+
         <ConsentCheckbox
           value={consent}
           onChange={setConsent}
@@ -136,7 +143,7 @@ export function Claim() {
         <button
           className="btn btn-primary"
           type="submit"
-          disabled={!termsAccepted}
+          disabled={!termsAccepted || (photo.fileName !== null && !photo.licenseAccepted)}
         >
           Submit claim
         </button>

@@ -50,3 +50,17 @@ export const VERIFICATION_METHOD_OPTIONS = [
   { value: 'email', label: 'Email' },
   { value: 'manual', label: 'Manual review' },
 ] as const
+
+// Listing photo + rights grant (PREP ONLY, 2026-09-17). The claim-time photo
+// field is dormant: there is no backend yet, so an uploaded file is not stored
+// anywhere. These strings are placeholders and wait on Tina's legal sign-off
+// like the consent strings above. The license wording is the important part:
+// it records WHO holds the rights and grants the directory a license to show
+// the photo, which the photo-sourcing research found is the strongest legal
+// posture (see research/listing-photo-sourcing-2026-09-17.md section 5).
+export const PHOTO_UPLOAD_LABEL = 'Listing photo (optional)'
+export const PHOTO_UPLOAD_HINT =
+  'Add a photo of your business. We only use a photo you provide or approve, never one copied from another site.'
+export const PHOTO_LICENSE_LABEL = 'Photo rights (required if you add a photo)'
+export const PHOTO_LICENSE_BODY =
+  'I confirm I own this photo or have the owner\'s permission to share it, and I grant this directory a license to show it on my listing.'

@@ -35,6 +35,10 @@ const anchors = ANCHOR_SLUGS.flatMap((a) => {
     : []
 })
 
+// Anchor logos too faint (thin near-transparent art) to float on the navy
+// card sit on a white plate instead; see .landing-biz-logo--plate in CSS.
+const PLATE_SLUGS = new Set(['cossart-design'])
+
 // Category tile photos (UI, 2026-09-16). Every file depicts a real Perry or
 // Houston County location in that trade, from Wikimedia Commons, all
 // photographer Michael Rivera (courthouse image CC BY-SA 3.0, rest 4.0;
@@ -148,15 +152,19 @@ export function Landing() {
           {anchors.map((a) => (
             <li key={a.slug}>
               <Link className="landing-biz-tile" to={`/listing/${a.slug}`}>
-                <span className="landing-biz-logo">
+                <span
+                  className={"landing-biz-logo" + (PLATE_SLUGS.has(a.slug) ? " landing-biz-logo--plate" : "")}
+                >
                   <img
                     src={import.meta.env.BASE_URL + a.image.replace(/^\//, '')}
                     alt={`${a.name} logo`}
                     loading="lazy"
                   />
                 </span>
-                <span className="landing-biz-name">{a.name}</span>
-                <span className="landing-biz-cat">{a.label}</span>
+                <span className="landing-biz-body">
+                  <span className="landing-biz-name">{a.name}</span>
+                  <span className="landing-biz-cat">{a.label}</span>
+                </span>
               </Link>
             </li>
           ))}
@@ -172,20 +180,23 @@ export function Landing() {
           <li>
             <span className="landing-step-num" aria-hidden="true">1</span>
             <p className="landing-step-text">
-              Search by keyword or browse the categories to find a local business.
+              <strong>Find it fast.</strong> Search by keyword or browse the
+              categories to find a local business.
             </p>
           </li>
           <li>
             <span className="landing-step-num" aria-hidden="true">2</span>
             <p className="landing-step-text">
-              Every listing is verified against public sources and carries a real
-              address and phone number.
+              <strong>Trust the listing.</strong> Every entry is verified
+              against public sources and carries a real address and phone
+              number.
             </p>
           </li>
           <li>
             <span className="landing-step-num" aria-hidden="true">3</span>
             <p className="landing-step-text">
-              Business owners can claim their listing for free and update it.
+              <strong>Claim it free.</strong> Business owners can claim their
+              listing for free and update it anytime.
             </p>
           </li>
         </ol>
