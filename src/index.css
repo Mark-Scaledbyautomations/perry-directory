@@ -34,6 +34,17 @@ body {
   padding: 0 20px;
 }
 
+/* Desktop only (Arbo, 2026-09-18): wider content column. The 20px -> 10px
+   gutter alone was invisible (max-width pins the box on wide screens), so
+   the cap rises to 1120px here too; copy blocks keep their own ch widths.
+   Tablet and mobile keep the original 960/20px. */
+@media (min-width: 1025px) {
+  .app {
+    max-width: 1120px;
+    padding-inline: 10px;
+  }
+}
+
 .site-header {
   display: flex;
   align-items: center;
@@ -59,26 +70,160 @@ body {
   text-decoration: none;
 }
 
+/* Pill CTA in the header (nav bar follows the reference build's format,
+   Arbo 2026-09-18). Azure token, not the reference's terracotta: the
+   site palette is locked to Set D. .site-nav prefix = higher specificity
+   than the link rules above, so no !important is needed. */
+.site-nav a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.site-nav .nav-cta {
+  background: var(--accent);
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.site-nav .nav-cta:hover {
+  background: var(--accent-hover);
+  text-decoration: none;
+}
+
 .site-main {
   padding: 24px 0;
 }
 
 .site-footer {
-  padding: 20px 0;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
+  /* 4-column footer (2026-09-18): full-bleed navy like the reference
+     build. Rendered outside .app (see App.tsx), so it spans the viewport
+     naturally. Shade = --mid, one step lighter than the claim card's
+     --deep, so that card reads as the brighter block on the page
+     (Arbo, 2026-09-18). */
+  background: var(--mid);
+  color: #ffffff;
+  padding: 48px 0 24px;
+  font-size: 14px;
+}
+
+.site-footer-grid {
+  /* Reuse the app content column: same max as .app, centered. */
+  max-width: 960px;
+  margin-inline: auto;
+  padding-inline: 20px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1.3fr;
+  gap: 32px;
+}
+
+.site-footer-brand {
+  margin: 0 0 8px;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.site-footer-tag {
+  margin: 0;
+  color: var(--pale);
   font-size: 13px;
+  line-height: 1.5;
 }
 
-.site-footer-links {
+.site-footer-heading {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.site-footer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
-  gap: 16px;
-  margin-top: 4px;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.site-footer-links a {
-  color: var(--accent);
+.site-footer-list a {
+  color: var(--pale);
   text-decoration: none;
+}
+
+.site-footer-list a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.site-footer-bar {
+  max-width: 960px;
+  margin-inline: auto;
+  padding: 20px 20px 0;
+  margin-top: 32px;
+  border-top: 1px solid var(--deep);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--pale);
+}
+
+.site-footer-bar p {
+  margin: 0;
+}
+
+/* keep the legacy credits class inside the new bar */
+.site-footer-credits {
+  margin: 0;
+}
+
+/* Footer columns track the widened content edge on desktop. Placed AFTER
+   the base rules on purpose (same-specificity cascade: earlier loses). */
+@media (min-width: 1025px) {
+  .site-footer-grid,
+  .site-footer-bar {
+    max-width: 1120px;
+    padding-inline: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-footer {
+    padding-top: 36px;
+  }
+
+  /* Header nav no longer fits one line at phone widths (measured overflow
+     445>390 before this); let the brand sit on its own row and the links
+     wrap onto two rows inside the viewport. */
+  .site-header {
+    flex-wrap: wrap;
+    row-gap: 10px;
+  }
+
+  .site-nav {
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    font-size: 14px;
+  }
+
+  .site-footer-grid {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 28px;
+  }
+
+  .site-footer-bar {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-footer-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .page-title {
@@ -263,8 +408,9 @@ body {
 }
 
 /* Stretched link: the business name link covers the whole card, so the card
-   is clickable without nesting interactive elements. The website link and the
-   "See more" button sit above it and stay independently clickable. */
+   is clickable without nesting interactive elements. The website link, the
+   phone tel: link/copy button, and the "See more" button sit above it and
+   stay independently clickable. */
 .listing-card-link::after {
   content: '';
   position: absolute;
@@ -272,6 +418,7 @@ body {
 }
 
 .listing-web,
+.listing-phone,
 .see-more {
   position: relative;
   z-index: 1;
@@ -475,6 +622,11 @@ body {
 
 .detail-list dd {
   margin: 0 0 12px 0;
+  /* Long URLs (e.g. locations sub-pages) overflowed the 390px viewport and
+     clipped everything below them. Same protection the listing cards carry
+     via .listing-web a (2026-09-03); the detail panel never got it until
+     the piece-c mobile breakpoint pass exposed it (2026-09-18). */
+  overflow-wrap: anywhere;
 }
 
 .detail-actions {
@@ -1339,6 +1491,16 @@ fieldset.field legend {
   margin-inline: auto;
 }
 
+/* Desktop: .cat-page carries its own 960 cap (piece b port), which would
+   defeat the wider .app container. Lifted here, AFTER the base rule on
+   purpose: same specificity, source order decides (media rule up top lost
+   this fight on first try). Tablet/mobile keep the narrower column. */
+@media (min-width: 1025px) {
+  .cat-page {
+    width: 100%;
+  }
+}
+
 .cat-breadcrumb {
   padding: 20px 0 0;
   font-size: 13px;
@@ -1729,5 +1891,241 @@ fieldset.field legend {
 
   .landing-claim-card .landing-btn {
     width: 100%;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Listing detail enhancements (UI buildout piece c, 2026-09-18).
+   Ported from OpenDesign artifact listing-detail-template.html
+   (perry-landing-ui-758e). All colors are existing tokens, no new values.
+   --------------------------------------------------------------------------- */
+
+/* Header: logo beside title + chip (was stacked above the H1) */
+.detail-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 22px;
+}
+
+.detail-head .detail-logo {
+  margin-bottom: 0;
+}
+
+.detail-titleblock {
+  min-width: 0;
+}
+
+/* Clickable category chip (pale fill, deep text; hover softens) */
+.cat-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 2px 14px;
+  background: var(--pale);
+  border: 1px solid var(--mid);
+  border-radius: 999px;
+  color: var(--deep);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.cat-chip:hover {
+  background: var(--accent-soft);
+}
+
+.cat-chip-sub {
+  color: var(--muted);
+}
+
+/* Phone number is a tel: link now; keep the card/detail ink color */
+.copy-phone-number {
+  color: inherit;
+  text-decoration: none;
+}
+
+.copy-phone-number:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Maps link under the address */
+.maps-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* "More in {category}" related strip */
+.related {
+  padding: 44px 0 8px;
+}
+
+.related-heading {
+  margin: 0 0 18px;
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+.related-heading a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.related-heading a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.related-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.rel-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 18px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rel-card:hover {
+  box-shadow: 0 4px 14px rgba(13, 43, 102, 0.1);
+}
+
+.rel-logo {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.rel-logo-empty {
+  background: var(--accent-soft);
+}
+
+.rel-name {
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.rel-card:hover .rel-name {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.rel-sub {
+  margin-top: auto;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Claim help guide (ported from claim-help-template.html, 2026-09-18).
+   Phase cards, hero, and buttons reuse the landing classes; only these
+   are new. Tokens only, no new colors. */
+.guide-lead {
+  margin: 0 0 30px;
+  max-width: 64ch;
+}
+
+.form-asks {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 0;
+}
+
+.form-ask {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 20px 22px;
+  /* Pastel blue info-callout treatment (Arbo, 2026-09-18): the same
+     colors as the workflow doc's HTML twin .callout.info (fill #ddf4ff,
+     border #54aeff). These doc colors are not app tokens (--accent-soft
+     is a paler #eef3fd), so the raw hex is the honest match. */
+  background: #ddf4ff;
+  border: 1px solid #54aeff;
+  border-radius: 8px;
+}
+
+.form-ask dt {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--deep);
+}
+
+.form-ask dd {
+  margin: 0;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.guide-links {
+  padding: 36px 0 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.guide-fine {
+  margin: 0;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+/* Responsive tiers (standardized 2026-09-18):
+   Desktop >= 1025px: 3-column strip, logo beside the title.
+   Tablet   641-1024px: 2-column strip, horizontal header stays.
+   Mobile  <= 640px: 1-column strip (matches the app's existing 640px
+   breakpoint used by the landing and header rules), title above the logo. */
+@media (max-width: 1024px) {
+  .related-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .detail-head {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  /* Stack the actions on touch (mobile-ergonomics pass, 2026-09-18).
+     Column direction, not width:100%: .detail-actions is a no-wrap flex
+     row, so width alone squeezes the buttons side by side (caught by
+     pixel measurement on the 390px screenshot). */
+  .detail-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .related {
+    padding-top: 32px;
+  }
+
+  .related-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-asks {
+    grid-template-columns: 1fr;
   }
 }

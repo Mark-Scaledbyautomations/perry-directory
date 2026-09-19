@@ -28,9 +28,15 @@ export function CopyPhone({ phone }: { phone: string }) {
     }
   }
 
+  // tel: link needs digits only; US numbers in this dataset are 10 digits,
+  // so +1 is the honest country prefix.
+  const tel = `tel:+1${phone.replace(/\D/g, '')}`
+
   return (
     <span className="copy-phone">
-      <span className="copy-phone-number">{phone}</span>
+      <a className="copy-phone-number" href={tel}>
+        {phone}
+      </a>
       <button
         className="copy-phone-btn"
         type="button"

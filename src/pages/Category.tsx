@@ -134,7 +134,7 @@ export function Category() {
             confirm your details and keep your address and phone number up to
             date.
           </p>
-          <Link className="landing-btn landing-btn-primary" to="/add">
+          <Link className="landing-btn landing-btn-primary" to="/claim-help">
             Claim your listing
           </Link>
         </div>

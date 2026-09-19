@@ -74,7 +74,7 @@ export function Landing() {
           <Link className="landing-btn landing-btn-primary" to="/directory">
             Browse the directory
           </Link>
-          <Link className="landing-btn landing-btn-secondary" to="/add">
+          <Link className="landing-btn landing-btn-secondary" to="/claim-help">
             Claim your business listing
           </Link>
         </div>
@@ -106,7 +106,7 @@ export function Landing() {
         </div>
       </section>
 
-      <section className="landing-section" aria-labelledby="landing-categories-heading">
+      <section id="categories" className="landing-section" aria-labelledby="landing-categories-heading">
         <h2 id="landing-categories-heading">Browse by category</h2>
         <p className="landing-section-sub">
           Nine categories cover all {totalListings} listings in the directory.
@@ -212,7 +212,7 @@ export function Landing() {
             confirm your details and keep your address and phone number up to
             date.
           </p>
-          <Link className="landing-btn landing-btn-primary" to="/add">
+          <Link className="landing-btn landing-btn-primary" to="/claim-help">
             Claim your listing
           </Link>
         </div>
