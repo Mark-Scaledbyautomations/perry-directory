@@ -152,11 +152,14 @@ export function Home() {
     <div className="page">
       <h1 className="page-title">Find a business in Perry</h1>
       {isAdmin && (
-        <div className="admin-banner" role="status">
-          <span>
-            <strong>Admin mode</strong>: review filters and badges are visible.
-          </span>
-          <Link className="admin-exit" to="/directory?admin=0">
+        <div className="adm-strip" role="status">
+          {/* 2026-09-19 (Arbo): this banner reuses the /admin strip's UI
+              (blue tag pill + note), replacing the old amber style. The
+              dashboard entrance lives in the header nav (AdminNavCta);
+              the exit link keeps its far-right spot. */}
+          <span className="adm-tag">Admin mode</span>
+          <p className="adm-note">This screen has review filters and visible badges.</p>
+          <Link className="adm-exit" to="/directory?admin=0">
             Exit admin mode
           </Link>
         </div>

@@ -1,26 +1,13 @@
-import { useState } from 'react'
-import { PRICING_TIERS, FOUNDING_COUPON_CODE } from '../data/pricing'
+import { PRICING_TIERS } from '../data/pricing'
+import { CouponRow, useFoundingCoupon } from '../components/FoundingCoupon'
 
 // Pricing ladder page. Comparison only: no checkout, no payment. Values are
-// the exact verified ladder from the Klamath Falls build. A founding-member
-// coupon reveals the discounted Premium price; the coupon is a display
-// affordance, not a payment gate (the real price is enforced at the payment
-// link, Phase 3).
+// the exact verified ladder from the Klamath Falls build. The founding-member
+// coupon lives in the shared FoundingCoupon component (the business-owners
+// guide uses the same one), so the code and reveal cannot drift between pages.
 
 export function Pricing() {
-  const [coupon, setCoupon] = useState('')
-  const [applied, setApplied] = useState(false)
-  const [error, setError] = useState('')
-
-  const applyCoupon = () => {
-    if (coupon.trim().toUpperCase() === FOUNDING_COUPON_CODE) {
-      setApplied(true)
-      setError('')
-    } else {
-      setApplied(false)
-      setError('That code is not recognized')
-    }
-  }
+  const c = useFoundingCoupon()
 
   return (
     <div className="page">
@@ -30,29 +17,18 @@ export function Pricing() {
         front of more local customers.
       </p>
 
-      <div className="coupon-row">
-        <input
-          className="coupon-input"
-          type="text"
-          value={coupon}
-          onChange={(e) => setCoupon(e.target.value)}
-          placeholder="Founding member code"
-          aria-label="Founding member code"
-        />
-        <button className="coupon-apply" onClick={applyCoupon}>
-          Apply
-        </button>
-      </div>
-      {error && <p className="coupon-error">{error}</p>}
-      {applied && (
-        <p className="coupon-success">
-          Founding member price applied to the Premium Listing.
-        </p>
-      )}
+      <CouponRow
+        coupon={c.coupon}
+        setCoupon={c.setCoupon}
+        apply={c.apply}
+        error={c.error}
+        applied={c.applied}
+        successText="Founding member price applied to the Premium Listing."
+      />
 
       <div className="pricing-grid">
         {PRICING_TIERS.map((tier) => {
-          const showFounding = applied && tier.foundingPrice
+          const showFounding = c.applied && tier.foundingPrice
           return (
             <div key={tier.name} className="pricing-card">
               <h2 className="pricing-name">{tier.name}</h2>

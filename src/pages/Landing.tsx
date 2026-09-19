@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { LISTINGS } from '../data/listings'
 import { CATEGORIES } from '../data/categories'
 import { BRAND_CITY, BRAND_STATE_FULL } from '../data/brand'
+import { ClaimMapChip } from '../components/ClaimMapChip'
 
 // Landing page (UI buildout piece a). Port of the OpenDesign "Quiet Local"
 // artifact (research/ui-buildout-od-2026-09-15/) into the app shell, refined
@@ -204,17 +205,47 @@ export function Landing() {
 
       <section className="landing-claim" aria-labelledby="landing-claim-heading">
         <div className="landing-claim-card">
-          <h2 id="landing-claim-heading">
-            Own a business in {BRAND_CITY}? Your listing is already here.
-          </h2>
-          <p>
-            Claiming is free and takes a few minutes. Once claimed, you can
-            confirm your details and keep your address and phone number up to
-            date.
-          </p>
-          <Link className="landing-btn landing-btn-primary" to="/claim-help">
-            Claim your listing
-          </Link>
+          <div className="landing-claim-copy">
+            <span className="landing-claim-badge">
+              <ClaimMapChip />
+            </span>
+            <h2 id="landing-claim-heading">
+              Your {BRAND_CITY} business is already here.
+            </h2>
+            <p>
+              Gain <strong>full control</strong>. Claiming is <strong>free</strong>{' '}
+              and takes just minutes. Update your address and contact details,
+              and keep everything current for your customers.
+            </p>
+          </div>
+          <div className="landing-claim-cta">
+            <Link className="landing-btn landing-btn-primary" to="/claim-help">
+              Claim your listing
+            </Link>
+            <ul className="landing-claim-pts">
+              <li>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="3" y="8" width="18" height="4" rx="1" />
+                  <path d="M12 8v13M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5h4s1.5-5 4-5a2.5 2.5 0 0 1 0 5h-4Z" />
+                </svg>
+                Free to claim
+              </li>
+              <li>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 7v5l3 2" />
+                </svg>
+                Quick setup
+              </li>
+              <li>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+                Person-reviewed claim
+              </li>
+            </ul>
+          </div>
         </div>
       </section>
     </div>

@@ -13,6 +13,7 @@ import { AddBusiness } from './pages/AddBusiness'
 import { Terms } from './pages/Terms'
 import { Privacy } from './pages/Privacy'
 import { ClaimHelp } from './pages/ClaimHelp'
+import { Admin } from './pages/Admin'
 import { ChatBot } from './components/ChatBot'
 
 // Pins the hidden ?admin=1 review flag to sessionStorage on ANY entry page.
@@ -27,6 +28,19 @@ function AdminFlagSync() {
   return null
 }
 
+// The "Admin Dashboard" nav pill (moved here from the directory banner,
+// Arbo 2026-09-19). Renders in the site header only while the sticky
+// ?admin=1 flag is on, so visitors never see the dashboard entrance.
+function AdminNavCta() {
+  const [searchParams] = useSearchParams()
+  if (!isAdminMode(searchParams)) return null
+  return (
+    <Link className="nav-cta nav-cta-admin" to="/admin">
+      Admin Dashboard
+    </Link>
+  )
+}
+
 // Tab title per route. App used to set BRAND_NAME once on mount, which ran
 // after child page effects and overwrote them (React runs child effects
 // first). This syncs on every navigation instead: pages that manage their
@@ -35,13 +49,14 @@ function AdminFlagSync() {
 function RouteTitleSync() {
   const location = useLocation()
   useEffect(() => {
-    // Category (2026-09-16), ListingDetail (2026-09-18, piece c), and
-    // ClaimHelp (2026-09-18) own their titles; everything else shows the
-    // brand name.
+    // Category (2026-09-16), ListingDetail (2026-09-18, piece c),
+    // ClaimHelp (2026-09-18), and Admin (2026-09-19, piece d) own their
+    // titles; everything else shows the brand name.
     if (
       location.pathname.startsWith('/category/') ||
       location.pathname.startsWith('/listing/') ||
-      location.pathname.startsWith('/claim-help')
+      location.pathname.startsWith('/claim-help') ||
+      location.pathname.startsWith('/admin')
     )
       return
     document.title = BRAND_NAME
@@ -148,6 +163,7 @@ export default function App() {
             {BRAND_NAME}
           </Link>
           <nav className="site-nav">
+            <AdminNavCta />
             <Link to="/directory">Directory</Link>
             <Link to="/#categories">Categories</Link>
             <Link to="/claim-help">For Business Owners</Link>
@@ -169,6 +185,9 @@ export default function App() {
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/claim-help" element={<ClaimHelp />} />
+            {/* Piece (d), 2026-09-19: read-only review dashboard, gated on
+                the sticky ?admin=1 flag inside the page itself. */}
+            <Route path="/admin" element={<Admin />} />
           </Routes>
         </main>
 

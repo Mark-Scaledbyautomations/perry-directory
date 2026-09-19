@@ -34,18 +34,28 @@ body {
   padding: 0 20px;
 }
 
-/* Desktop only (Arbo, 2026-09-18): wider content column. The 20px -> 10px
-   gutter alone was invisible (max-width pins the box on wide screens), so
-   the cap rises to 1120px here too; copy blocks keep their own ch widths.
+/* Desktop (Arbo, 2026-09-18; widened to the full-screen column 2026-09-19):
+   the content column rises to 1680px with a 24px gutter. Companion rules
+   that override base declarations live at the END of this file (same-
+   specificity cascade: later wins, the piece-c lesson). Copy blocks never
+   stretch with the container: each carries its own ch/px measure cap.
    Tablet and mobile keep the original 960/20px. */
 @media (min-width: 1025px) {
   .app {
-    max-width: 1120px;
-    padding-inline: 10px;
+    max-width: 1680px;
+    padding-inline: 24px;
   }
 }
 
 .site-header {
+  /* Sticky top on scroll, like the reference build (Klamath), Arbo
+     2026-09-19. Solid --bg so content scrolls under it cleanly; z-index
+     50 sits above cards/banners but below the chatbot panel (100).
+     Works inside .app because that column spans the whole page height. */
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -91,6 +101,18 @@ body {
 .site-nav .nav-cta:hover {
   background: var(--accent-hover);
   text-decoration: none;
+}
+
+/* Admin Dashboard pill (2026-09-19, Arbo): pastel-blue variant of the nav
+   pill, placed BEFORE Directory in the nav. Text is --deep on --pale,
+   the documented 10.76:1 pair (white would fail on pastel). Sits after
+   the .nav-cta rules so the same-specificity cascade resolves here. */
+.site-nav .nav-cta-admin {
+  background: var(--pale);
+  color: var(--deep);
+}
+.site-nav .nav-cta-admin:hover {
+  background: color-mix(in oklab, var(--pale) 70%, var(--accent) 30%);
 }
 
 .site-main {
@@ -186,8 +208,8 @@ body {
 @media (min-width: 1025px) {
   .site-footer-grid,
   .site-footer-bar {
-    max-width: 1120px;
-    padding-inline: 10px;
+    max-width: 1680px;
+    padding-inline: 24px;
   }
 }
 
@@ -264,25 +286,9 @@ body {
   border-radius: 8px;
 }
 
-.admin-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 12px 0;
-  padding: 8px 14px;
-  background: #fff7e6;
-  border: 1px solid #f0d9a8;
-  border-radius: 8px;
-  font-size: 14px;
-  color: var(--ink);
-}
-
-.admin-exit {
-  color: var(--accent);
-  font-weight: 600;
-  white-space: nowrap;
-}
+/* 2026-09-19: the dashboard entrance pill moved to the header nav
+   (AdminNavCta in App.tsx) and reuses .nav-cta; the old banner-button
+   rules were retired with it. */
 
 .search-bar,
 .category-filter,
@@ -297,6 +303,16 @@ body {
 
 .search-bar {
   flex: 1;
+}
+
+/* 2026-09-19 (Arbo): search bar + category dropdown edges get the Set D
+   accent (#1b5bd7, token, per his quoted note) with the same soft halo
+   treatment as the listing cards. Scoped override: the claim/add form
+   fields (.field input/select) keep the plain gray base rule. */
+.search-bar,
+.category-filter {
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 12px -5px rgba(27, 91, 215, 0.5);
 }
 
 .active-filters {
@@ -350,12 +366,21 @@ body {
 }
 
 .listing-card {
+  /* Edge color = #01a3d3, the same sky blue Arbo sampled from his swatch
+     for the claim-button ring (2026-09-19). Soft outer halo at low alpha
+     so the grid reads calm; hover brings the glow up one notch. */
   background: #fff;
-  border: 1px solid var(--line);
+  border: 1px solid #01a3d3;
   border-radius: 8px;
   padding: 16px;
   overflow-wrap: anywhere;
   position: relative;
+  box-shadow: 0 0 14px -6px rgba(1, 163, 211, 0.45);
+  transition: box-shadow 0.15s ease;
+}
+
+.listing-card:hover {
+  box-shadow: 0 0 18px -2px rgba(1, 163, 211, 0.6);
 }
 
 .listing-logo {
@@ -854,7 +879,10 @@ fieldset.field legend {
 
 .pricing-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  /* auto-FIT (not fill): there are exactly four tiers, so at the widened
+     container empty tracks would strand; fit collapses them and the four
+     cards share the row. Narrow screens behave the same as before. */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
 }
 
@@ -1264,9 +1292,25 @@ fieldset.field legend {
 
 .site-footer-credits {
   font-size: 12px;
-  color: var(--muted);
+  /* Arbo 2026-09-19: was --muted (a light-page gray, ~3:1 on the navy
+     footer, hard to read); now --pale like the rest of the bar (8.08:1
+     on --mid, 10.15:1 on --deep). The right-side clearance below keeps
+     the license line out from under the fixed "Chat with us" button. */
+  color: var(--pale);
   margin: 10px 0 0;
   text-align: center;
+}
+
+/* Desktop only: the chat button overlaps the footer's bottom-right corner
+   at these widths. Measured: the license text's right edge = barRight -
+   padding, the button's left edge = vw - 164; both scale with vw, so the
+   clearance is width-invariant at (padding - 125) px. 150 = 25px clear at
+   every desktop width, and 30px further right than the first 180 setting
+   per Arbo's "back toward the button a little". */
+@media (min-width: 1025px) {
+  .site-footer-credits {
+    padding-inline-end: 150px;
+  }
 }
 
 
@@ -1395,18 +1439,31 @@ fieldset.field legend {
 }
 
 .landing-biz-tile {
+  /* 2026-09-19 (Arbo): card color = the sky->royal diagonal gradient
+     sampled from his swatch capture (top-left #0d84d6, center #1277d8,
+     bottom-right #1368d1), replacing the flat --deep navy. The
+     bottom scrim (::before) stays, so the white name/category text
+     still sits on near-opaque navy exactly as before. */
   position: relative;
   display: block;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  background: var(--deep);
+  background: linear-gradient(135deg, #0d84d6 0%, #1277d8 55%, #1368d1 100%);
   border-radius: 16px;
   text-decoration: none;
   transition: box-shadow 0.15s ease;
 }
 
-.landing-biz-tile:hover {
-  box-shadow: 0 10px 28px rgba(13, 43, 102, 0.28);
+.landing-biz-tile:hover,
+.landing-biz-tile:focus-visible {
+  /* 2026-09-19 (Arbo): hover glow in the claim button's sampled sky blue
+     (#01a3d3), halo only, no edge ring, kept byte-identical to the
+     category tiles. Reduced this pass at Arbo's ask (20px/6px/0.5 ->
+     16px/3px/0.35). Navy depth shadow kept underneath; focus-visible
+     shares it for keyboard users. */
+  box-shadow:
+    0 0 16px 3px rgba(1, 163, 211, 0.35),
+    0 10px 28px rgba(13, 43, 102, 0.28);
 }
 
 .landing-biz-tile::before {
@@ -1716,8 +1773,16 @@ fieldset.field legend {
   transition: box-shadow 0.15s ease;
 }
 
-.landing-cat-tile:hover {
-  box-shadow: 0 10px 28px rgba(13, 43, 102, 0.28);
+.landing-cat-tile:hover,
+.landing-cat-tile:focus-visible {
+  /* 2026-09-19 (Arbo): hover glow in the claim button's sampled color
+     (#01a3d3) as a soft halo only, no edge ring. Reduced this pass at
+     Arbo's ask (20px/6px/0.5 -> 16px/3px/0.35): same tint, gentler.
+     Navy depth shadow kept underneath. Focus-visible shares it so
+     keyboard users see the same affordance. */
+  box-shadow:
+    0 0 16px 3px rgba(1, 163, 211, 0.35),
+    0 10px 28px rgba(13, 43, 102, 0.28);
 }
 
 .landing-cat-photo {
@@ -1820,21 +1885,98 @@ fieldset.field legend {
 }
 
 .landing-claim-card {
-  /* Set D: the claim moment goes solid deep navy with a reversed button,
-     so "own" reads apart from "browse" by band weight, not just hue. */
-  background: var(--deep);
-  border: 1px solid var(--deep);
-  border-radius: 8px;
-  padding: 38px 36px;
+  /* Set D claim band, reference-faithful pass (Arbo 2026-09-19: "use the
+     same colors"). The hexes below were SAMPLED from Arbo's reference
+     capture, not translated: top-left aqua #00a7d3, mid royal #1670d9,
+     bottom-right deep #053c86, button blue #1a7fd6 with a white glow
+     ring. Explicit palette-owner call for this band; the rest of the
+     site stays on Set D tokens. */
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  background: linear-gradient(125deg, #00a7d3 0%, #1670d9 48%, #0742ab 72%, #053c86 100%);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 12px;
+  box-shadow:
+    0 14px 40px -14px rgba(5, 60, 134, 0.55);
+  padding: 40px 38px;
+  color: #fff;
+}
+
+/* Map-chip badge (the reference's map card): beige tile, faint street
+   lines, blue pin, "Perry" label, drawn as inline SVG in the page. */
+.landing-claim-badge {
+  display: inline-flex;
+  margin-bottom: 16px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px -6px rgba(5, 60, 134, 0.5);
+}
+
+.landing-claim-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.landing-claim-cta {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .landing-claim-card .landing-btn-primary {
-  background: #fff;
-  color: var(--mid);
+  /* Button blue sampled from the reference (#1a7fd6). Edge treatment
+     per Arbo 2026-09-19: solid ring + halo in #01a3d3, the exact color
+     sampled from the swatch he provided (deep sky blue, uniform fill).
+     White label on #1a7fd6 = 4.6:1, past AA. */
+  background: #1a7fd6;
+  color: #fff;
+  white-space: nowrap;
+  text-transform: none;
+  box-shadow:
+    0 0 0 4px #01a3d3,
+    0 0 24px 10px rgba(1, 163, 211, 0.55),
+    0 12px 28px -8px rgba(5, 60, 134, 0.6);
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .landing-claim-card .landing-btn-primary:hover {
-  background: var(--accent-soft);
+  background: #1568b4;
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 5px #01a3d3,
+    0 0 30px 14px rgba(1, 163, 211, 0.65),
+    0 14px 30px -8px rgba(5, 60, 134, 0.75);
+}
+
+.landing-claim-card .landing-btn-primary:focus-visible {
+  outline: 3px solid var(--deep);
+  outline-offset: 3px;
+}
+
+.landing-claim-pts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12.5px;
+  color: #fff;
+}
+
+.landing-claim-pts li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.landing-claim-pts svg {
+  flex: 0 0 auto;
+  opacity: 0.9;
 }
 
 .landing-claim-card h2 {
@@ -1844,10 +1986,16 @@ fieldset.field legend {
   color: #fff;
 }
 
-.landing-claim-card p {
-  margin: 0 0 24px;
-  color: var(--pale);
+/* Copy column only: keeps the 24px breath under the body text without
+   leaking into the CTA column's note. */
+.landing-claim-copy p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
   max-width: 56ch;
+}
+
+.landing-claim-copy p strong {
+  color: #fff;
 }
 
 @media (max-width: 640px) {
@@ -1887,6 +2035,13 @@ fieldset.field legend {
 
   .landing-claim-card {
     padding: 28px 22px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+
+  .landing-claim-cta {
+    align-items: stretch;
   }
 
   .landing-claim-card .landing-btn {
@@ -2127,5 +2282,587 @@ fieldset.field legend {
 
   .form-asks {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   Admin review dashboard (piece d, 2026-09-19). Ported from the
+   OpenDesign artifact admin-dashboard-template.html (run bc4fe817).
+   All colors are Set D tokens or color-mix() of them. The adm-strip tag/
+   note/exit UI is shared with the directory page's admin banner since
+   2026-09-19 (Arbo's merge; the old amber .admin-banner was retired).
+   Base rules first, media tiers last so they
+   win the same-specificity cascade fight (the piece-c lesson).
+   ============================================================ */
+
+.adm-page {
+  padding-block: 18px 40px;
+}
+
+.adm-strip {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding: 9px 14px;
+  background: var(--accent-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 18px;
+}
+.adm-tag {
+  display: inline-flex;
+  align-items: center;
+  background: var(--mid);
+  color: #fff;
+  border-radius: 999px;
+  padding: 3px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.adm-note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--deep);
+}
+.adm-exit {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 10px 2px;
+}
+.adm-exit:hover { color: var(--accent); }
+
+.adm-head { padding-bottom: 14px; }
+.adm-title {
+  margin: 0 0 4px;
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.adm-sub {
+  margin: 0;
+  max-width: 78ch;
+  font-size: 14px;
+  color: var(--muted);
+}
+.adm-snapshot {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.adm-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.adm-kpi-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px 11px;
+}
+.adm-kpi-label {
+  margin: 0 0 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.adm-kpi-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+}
+.adm-kpi-value {
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.adm-kpi-of {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-left: 3px;
+  white-space: nowrap;
+}
+.adm-kpi-pct {
+  background: var(--accent-soft);
+  color: var(--deep);
+  border-radius: 6px;
+  padding: 1px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.adm-dist-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.adm-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.adm-panel {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 18px 12px;
+  min-width: 0;
+}
+.adm-panel-title {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.adm-panel-note {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.adm-stat-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.adm-stat-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 5.5px 0;
+  border-bottom: 1px solid color-mix(in oklab, var(--line) 60%, transparent);
+}
+.adm-stat-row:last-child { border-bottom: 0; }
+.adm-stat-name {
+  font-size: 14.5px;
+  color: var(--ink);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.adm-stat-num {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.adm-tier-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+/* Plan/claim mix bars (2026-09-19, Arbo's ask: visualize what plan and
+   claim status the dataset holds). 100% stacked bar per panel; segments
+   are the two states of each field, widths computed like every number
+   here. A zero segment renders nothing (guarded in JSX), so today both
+   bars are full-width free/unclaimed; they fill as the funnel moves. */
+.adm-mix-bar {
+  display: flex;
+  height: 50px; /* 5x the original 10px (Arbo, 2026-09-19). The bars
+                   already span their full panel width, so the axis that
+                   can grow is thickness. */
+  border-radius: 8px;
+  background: var(--accent-soft);
+  border: 1px solid var(--line); /* define the track: today both bars are
+                                    all free/unclaimed (pale on soft-tint),
+                                    and without an edge they read as a
+                                    missing element in review */
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.adm-mix-seg { height: 100%; }
+.adm-mix-seg-paid { background: var(--accent); }
+.adm-mix-seg-free { background: var(--pale); }
+.adm-legend { display: inline-flex; align-items: center; gap: 7px; }
+.adm-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.adm-swatch-paid { background: var(--accent); }
+.adm-swatch-free { background: var(--pale); border: 1px solid var(--line); }
+.adm-zero-note {
+  margin: 0;
+  max-width: 56ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.adm-review-section { margin-bottom: 28px; }
+.adm-review-heading {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+}
+.adm-review-intro {
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.adm-review-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+.adm-review-title {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.adm-review-link {
+  display: block;
+  padding: 6px 8px;
+  margin-inline: -8px;
+  border-radius: 6px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14.5px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.adm-review-link:hover {
+  background: color-mix(in oklab, var(--accent-soft) 60%, #fff 40%);
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.adm-shared-group { padding: 8px 0; }
+.adm-shared-email {
+  display: inline-block;
+  background: var(--accent-soft);
+  color: var(--deep);
+  border-radius: 6px;
+  padding: 1px 8px;
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+.adm-shared-names {
+  display: block;
+  margin-top: 4px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.adm-shared-names a {
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--accent) 45%, transparent);
+}
+.adm-shared-names a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.adm-review-note {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.adm-field-panel { margin-bottom: 8px; }
+.adm-field-copy {
+  margin: 0;
+  max-width: 90ch;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.btn-primary-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+.btn-primary-inline:hover { background: var(--accent-hover); }
+
+/* Tablet: KPI cards go 3-up to 2-up at the app's existing 1024px tier. */
+@media (max-width: 1024px) {
+  .adm-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Mobile tier (the app's 640px line): everything single column, values
+   shrink one step, the exit link drops to its own full-width row. */
+@media (max-width: 640px) {
+  .adm-exit { margin-left: 0; width: 100%; }
+  .adm-kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .adm-kpi-value { font-size: 19px; }
+  .adm-dist-grid { grid-template-columns: 1fr; }
+  .adm-tier-grid { grid-template-columns: 1fr; }
+  .adm-review-grid { grid-template-columns: 1fr; }
+  .adm-title { font-size: 20px; }
+}
+
+/* ============================================================
+   Full-screen widening (Arbo, 2026-09-19): companion rules for
+   the 1680px desktop column, appended at the END of the file on
+   purpose (same-specificity cascade: later wins, the piece-c
+   lesson). Copy blocks keep their own measure caps so nothing
+   reads as a stretched line of text.
+   ============================================================ */
+@media (min-width: 1025px) {
+  /* Search stays a search box: capped so it does not become a
+     1200px bar; filters sit beside it, empty space stays right. */
+  .toolbar .search-bar {
+    max-width: 560px;
+  }
+
+  /* Listing detail prose caps its measure (no-op on the narrow
+     auto-fill cards; binds the detail page's full text). */
+  .listing-desc {
+    max-width: 72ch;
+  }
+
+  /* Fact rows: label column + value inline. The dt/dd pairs wrap
+     in .detail-row divs (valid HTML5.2 dl grouping), so a missing
+     phone/email can never shift a shared grid's columns. */
+  .detail-list {
+    max-width: 1120px;
+  }
+  .detail-row {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .detail-list .detail-row dt {
+    flex: 0 0 120px;
+  }
+  .detail-list .detail-row dd {
+    margin: 0;
+    flex: 1;
+    min-width: 0; /* keeps overflow-wrap:anywhere in a flex track */
+  }
+}
+
+/* Wide desktop (>=1440px): multi-item grids reflow so tiles, result
+   rows, and admin panels keep useful sizes instead of stretching.
+   The directory listing grid needs nothing (auto-fill grows columns). */
+@media (min-width: 1440px) {
+  /* Browse by category (Arbo, 2026-09-19): 9 tiles in 2 balanced rows,
+     5 smaller + 4 big (editorial mosaic). A 20-column grid: the first
+     five tiles span 4 (5/4 row), the last four span 5 (16/10
+     landscape row); the two rows land within ~2% of equal height, so
+     the size difference reads deliberate, not ragged. The big row
+     carries the four heaviest categories (Retail 45, Professional
+     Services 83, Nonprofits 35, Fitness 10). Gated to wide screens
+     only: below 1440 the tiles get too short to hold their text, so
+     1025-1439 keeps the shipped 3x3 and phone/tablet are untouched.
+     Order unchanged (sorted); zero JSX. */
+  .landing-category-grid {
+    grid-template-columns: repeat(20, 1fr);
+  }
+  .landing-category-grid li:nth-child(-n + 5) {
+    grid-column: span 4;
+  }
+  .landing-category-grid li:nth-child(n + 6) {
+    grid-column: span 5;
+  }
+  .landing-category-grid li:nth-child(-n + 5) .landing-cat-tile {
+    aspect-ratio: 5 / 4;
+  }
+  .landing-category-grid li:nth-child(n + 6) .landing-cat-tile {
+    aspect-ratio: 16 / 10;
+  }
+
+  .landing-anchor-grid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+  .form-asks {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .cat-results-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    align-items: stretch;
+  }
+  .adm-kpi-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .adm-dist-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .adm-review-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Plans-for-every-stage cards on the business-owners guide (Arbo
+   2026-09-19): Klamath's pricing section format, our Set D palette.
+   Reference uses green/gold/red tier colors; Set D stands in with the
+   azure ladder: --pale for the free card accent, --accent for paid,
+   --deep for the managed "Chat with us" button. Token-only. */
+.owner-plans {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.owner-plan-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--accent);
+  border-radius: 12px;
+  background: #fff;
+  padding: 22px 20px;
+  gap: 0;
+}
+
+.owner-plan-card:first-child {
+  border-top-color: var(--pale);
+}
+
+.owner-plan-name {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--deep);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.owner-plan-desc {
+  margin: 0 0 14px;
+  font-size: 13.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.owner-plan-price {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.1;
+}
+
+.owner-plan-was {
+  margin-left: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.owner-plan-period {
+  margin: 2px 0 14px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.owner-plan-features {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.owner-plan-features li {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.owner-plan-features li::before {
+  content: "\2713";
+  color: var(--accent);
+  font-weight: 700;
+  flex: 0 0 auto;
+}
+
+.owner-plan-cta {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.owner-plan-cta:hover {
+  background: var(--accent-hover);
+}
+
+.owner-plan-cta-free {
+  background: #fff;
+  color: var(--deep);
+  border: 1.5px solid var(--accent);
+}
+
+.owner-plan-cta-free:hover {
+  background: var(--accent-soft);
+}
+
+.owner-plan-cta-deep {
+  background: var(--deep);
+}
+
+.owner-plan-cta-deep:hover {
+  background: var(--mid);
+}
+
+@media (min-width: 641px) {
+  .owner-plans {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1025px) {
+  .owner-plans {
+    grid-template-columns: repeat(4, 1fr);
+    align-items: stretch;
   }
 }

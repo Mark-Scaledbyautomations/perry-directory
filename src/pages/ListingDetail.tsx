@@ -117,33 +117,33 @@ export function ListingDetail() {
 
       <dl className="detail-list">
         {listing.phone && (
-          <>
+          <div className="detail-row">
             <dt>Phone</dt>
             <dd>
               <CopyPhone phone={listing.phone} />
             </dd>
-          </>
+          </div>
         )}
         {listing.email && (
-          <>
+          <div className="detail-row">
             <dt>Email</dt>
             <dd>
               <a href={`mailto:${listing.email}`}>{listing.email}</a>
             </dd>
-          </>
+          </div>
         )}
         {listing.website && (
-          <>
+          <div className="detail-row">
             <dt>Website</dt>
             <dd>
               <a href={listing.website} target="_blank" rel="noreferrer">
                 {listing.website}
               </a>
             </dd>
-          </>
+          </div>
         )}
         {listing.street_address && (
-          <>
+          <div className="detail-row">
             <dt>Address</dt>
             <dd>
               {listing.street_address}, {listing.city}, {listing.state}{' '}
@@ -158,13 +158,13 @@ export function ListingDetail() {
                 Open in Google Maps
               </a>
             </dd>
-          </>
+          </div>
         )}
         {listing.hours && (
-          <>
+          <div className="detail-row">
             <dt>Hours</dt>
             <dd>{listing.hours}</dd>
-          </>
+          </div>
         )}
       </dl>
 
