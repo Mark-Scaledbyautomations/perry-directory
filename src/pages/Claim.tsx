@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { LISTINGS } from '../data/listings'
+import { useListings } from '../data/useListings'
 import { ConsentCheckbox, type ConsentState } from '../components/ConsentCheckbox'
 import { PhotoUpload, type PhotoUploadState } from '../components/PhotoUpload'
 import {
@@ -14,7 +14,8 @@ import {
 
 export function Claim() {
   const { slug } = useParams<{ slug: string }>()
-  const listing = LISTINGS.find((l) => l.slug === slug)
+  const [listings, loaded] = useListings()
+  const listing = listings.find((l) => l.slug === slug)
 
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -31,6 +32,14 @@ export function Claim() {
   })
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+
+  if (!loaded) {
+    return (
+      <div className="page">
+        <h1 className="page-title">Loading listing</h1>
+      </div>
+    )
+  }
 
   if (!listing) {
     return (

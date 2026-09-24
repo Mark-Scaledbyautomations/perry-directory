@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { LISTINGS } from '../data/listings'
+import { useListings } from '../data/useListings'
 import { categoryBySlug } from '../data/categories'
 import { BRAND_CITY, BRAND_STATE_FULL } from '../data/brand'
 import { ClaimMapChip } from '../components/ClaimMapChip'
@@ -20,9 +20,10 @@ function displayName(name: string): string {
 
 export function Category() {
   const { slug = '' } = useParams()
+  const [listings] = useListings()
   const category = categoryBySlug(slug)
-  const listings = category
-    ? LISTINGS.filter((l) => l.category_slug === category.slug)
+  const listingsInCat = category
+    ? listings.filter((l) => l.category_slug === category.slug)
     : []
 
   useEffect(() => {
@@ -48,7 +49,7 @@ export function Category() {
   // Subcategory counts, most common first (ties break by label), shown as
   // plain inline text, never as clickable chips.
   const subCounts = new Map<string, number>()
-  for (const l of listings) {
+  for (const l of listingsInCat) {
     const sub = l.subcategory || 'Other'
     subCounts.set(sub, (subCounts.get(sub) || 0) + 1)
   }
@@ -76,7 +77,7 @@ export function Category() {
         </h1>
         <p className="cat-hero-sub">{category.description}</p>
         <p className="cat-count">
-          {listings.length} {listings.length === 1 ? 'business' : 'businesses'}
+          {listingsInCat.length} {listingsInCat.length === 1 ? 'business' : 'businesses'}
         </p>
         {subs.length > 1 && (
           <p className="cat-subcategories">
@@ -91,7 +92,7 @@ export function Category() {
           {name} businesses
         </h2>
         <ul className="cat-results-list">
-          {listings.map((l) => (
+          {listingsInCat.map((l) => (
             <li key={l.slug}>
               <div className="cat-biz-card">
                 <div className="cat-biz-card-text">

@@ -12,6 +12,16 @@
   --deep: #0d2b66;
   --mid: #123c8f;
   --pale: #dbe6fb;
+  /* Offer accent (promotional-edge pass 2026-09-24, Arbo: variants 1+2+3
+     pick). Rust #c2410c: same hue as the measured City Hall brick (09-16
+     census), complementary heat against the azure field. Reserved for the
+     money path only (hero claim CTA, claim-help CTA, premium plan card +
+     flag) so it stays a signal, never wallpaper. Computed WCAG: white
+     label 5.18:1, as text on white 5.18:1, on --pale 4.12:1 (research/
+     promo-palette-research-2026-09-24.md). Hover = 88% mix toward black,
+     white label 6.32:1. */
+  --offer: #c2410c;
+  --offer-hover: #ab390b;
   --accent-hover: #164ab3;
 }
 
@@ -28,10 +38,24 @@ body {
   line-height: 1.6;
 }
 
+/* Sticky footer (2026-09-24, Arbo: on short pages like /add the footer
+   floated mid-viewport). #root stacks header-content and footer in one
+   column at least one screen tall; .app takes the slack, so the footer
+   always sits at the bottom. Long pages scroll normally (min-height, not
+   height). */
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
 .app {
+  flex: 1 1 auto;
   max-width: 960px;
   margin: 0 auto;
   padding: 0 20px;
+  width: 100%;
 }
 
 /* Desktop (Arbo, 2026-09-18; widened to the full-screen column 2026-09-19):
@@ -72,35 +96,66 @@ body {
 
 .site-nav {
   display: flex;
+  align-items: center;
   gap: 20px;
 }
 
 .site-nav a {
-  color: var(--accent);
+  color: var(--ink);
+  font-weight: 700;
   text-decoration: none;
 }
 
 /* Pill CTA in the header (nav bar follows the reference build's format,
-   Arbo 2026-09-18). Azure token, not the reference's terracotta: the
-   site palette is locked to Set D. .site-nav prefix = higher specificity
+   Arbo 2026-09-18). Recolored 2026-09-24 (offer-colors pass, board panel
+   2): pale chip with deep navy text, so saturated azure stays reserved for
+   click-to-act buttons. Bold + no underline per Arbo 2026-09-24.
+   .site-nav prefix = higher specificity
    than the link rules above, so no !important is needed. */
 .site-nav a:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration: none;
+  color: var(--deep);
 }
 
+/* Arbo restored the shipped azure fill on this pill (2026-09-24, after the
+   offer-colors pass had demoted it to the pale chip); weight 700 kept from
+   the same-day nav tweak. White label 5.96:1 on --accent. */
 .site-nav .nav-cta {
   background: var(--accent);
   color: #ffffff;
+  border: 1px solid transparent;
   border-radius: 999px;
   padding: 8px 16px;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
 }
 
 .site-nav .nav-cta:hover {
   background: var(--accent-hover);
+  color: #ffffff;
   text-decoration: none;
+}
+
+/* "You are here" marker (Arbo, 2026-09-24, corrected same day: "the font
+   itself should turn gold, just the font, no added anything"): the route-
+   owning nav entry's text goes gold #f59f00, nothing else changes. On the
+   azure pill the label stays white instead (gold-on-azure is 2.79:1,
+   unreadable), the gold EDGE marks it there; specificity (.site-nav
+   a.nav-here = 0-2-1) beats both base rules, so no !important. Known and
+   accepted on links: gold ink on white measures 2.13:1, under AA; this is
+   Arbo's deliberate call for the current-page marker only. */
+.site-nav a.nav-here {
+  color: #f59f00;
+}
+
+/* The pill, on its own page, also gets a gold edge (Arbo, 2026-09-24:
+   "the pill edges should turn gold as well"). The transparent 1px border
+   in the base rule keeps the pill the same size before/after. Plain links
+   stay FONT-ONLY (no added anything); the edge is the pill's own chip
+   frame turning gold to match its gold label. */
+.site-nav .nav-cta.nav-here {
+  border-color: #f59f00;
+  color: #ffffff;
 }
 
 /* Admin Dashboard pill (2026-09-19, Arbo): pastel-blue variant of the nav
@@ -122,10 +177,12 @@ body {
 .site-footer {
   /* 4-column footer (2026-09-18): full-bleed navy like the reference
      build. Rendered outside .app (see App.tsx), so it spans the viewport
-     naturally. Shade = --mid, one step lighter than the claim card's
-     --deep, so that card reads as the brighter block on the page
-     (Arbo, 2026-09-18). */
-  background: var(--mid);
+     naturally. 2026-09-23: background is the reference build's hero navy
+     measured pixel-for-pixel from Arbo's screenshot: #1B3A5C (was one
+     step of Set D, --mid). Raw hex is the honest match; promoting it to
+     a token is Arbo's call (same rule as the claim-band measured colors).
+     White text 11.63:1, --pale links 9.26:1 on this shade. */
+  background: #1b3a5c;
   color: #ffffff;
   padding: 48px 0 24px;
   font-size: 14px;
@@ -240,6 +297,25 @@ body {
   .site-footer-bar {
     flex-direction: column;
   }
+
+  /* Grid toolbar: the search bar + category select never fit one line at
+     phone width (measured 459 > 390 overflow on /directory, UI sweep
+     2026-09-24); stack them full-width, same fix style as the header nav
+     above. The admin filter row uses the same .toolbar class and stacks
+     with it, which is fine for a review aid. */
+  .toolbar {
+    flex-wrap: wrap;
+  }
+
+  .toolbar .search-bar {
+    max-width: none;
+    flex: 1 1 100%;
+  }
+
+  .category-filter {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
 }
 
 @media (max-width: 480px) {
@@ -264,8 +340,9 @@ body {
 }
 
 .back-link a {
-  color: var(--accent);
-  text-decoration: none;
+  color: var(--deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .back-link a:hover {
@@ -340,14 +417,14 @@ body {
 }
 
 .active-chip:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  border-color: var(--deep);
+  color: var(--deep);
 }
 
 .active-clear-all {
   border: none;
   background: none;
-  color: var(--accent);
+  color: var(--deep);
   font-size: 13px;
   cursor: pointer;
   text-decoration: underline;
@@ -370,12 +447,12 @@ body {
      for the claim-button ring (2026-09-19). Soft outer halo at low alpha
      so the grid reads calm; hover brings the glow up one notch. */
   background: #fff;
-  border: 1px solid #01a3d3;
+  border: 1px solid var(--line);
   border-radius: 8px;
   padding: 16px;
   overflow-wrap: anywhere;
   position: relative;
-  box-shadow: 0 0 14px -6px rgba(1, 163, 211, 0.45);
+  box-shadow: none;
   transition: box-shadow 0.15s ease;
 }
 
@@ -429,7 +506,7 @@ body {
 }
 
 .listing-name a:hover {
-  color: var(--accent);
+  color: var(--deep);
 }
 
 /* Stretched link: the business name link covers the whole card, so the card
@@ -535,9 +612,9 @@ body {
   border: none;
   padding: 0;
   margin: 0 0 8px 0;
-  color: var(--accent);
+  color: var(--ink);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -565,7 +642,7 @@ body {
   border-radius: 4px;
   padding: 1px 8px;
   font-size: 12px;
-  color: var(--accent);
+  color: var(--deep);
   cursor: pointer;
 }
 
@@ -587,7 +664,7 @@ body {
 
 .badge-premium {
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--deep);
 }
 
 .badge-scope {
@@ -919,7 +996,7 @@ fieldset.field legend {
 
 .pricing-note {
   font-size: 13px;
-  color: var(--accent);
+  color: var(--deep);
   margin: 8px 0 0 0;
 }
 
@@ -1565,7 +1642,7 @@ fieldset.field legend {
 }
 
 .cat-breadcrumb a {
-  color: var(--accent);
+  color: var(--deep);
   text-decoration: none;
   font-weight: 600;
 }
@@ -1641,7 +1718,7 @@ fieldset.field legend {
 
 .cat-biz-card:hover {
   background: color-mix(in oklab, var(--accent-soft) 60%, #fff 40%);
-  border-color: color-mix(in oklab, var(--line) 55%, var(--accent) 45%);
+  border-color: var(--mid);
 }
 
 .cat-biz-card-text {
@@ -1886,15 +1963,17 @@ fieldset.field legend {
 
 .landing-claim-card {
   /* Set D claim band, reference-faithful pass (Arbo 2026-09-19: "use the
-     same colors"). The hexes below were SAMPLED from Arbo's reference
-     capture, not translated: top-left aqua #00a7d3, mid royal #1670d9,
-     bottom-right deep #053c86, button blue #1a7fd6 with a white glow
-     ring. Explicit palette-owner call for this band; the rest of the
-     site stays on Set D tokens. */
+     same colors"), sampled hexes, not translated. The band was frozen
+     2026-09-24 and Arbo opened it the same day with this one edit: the
+     4-stop gradient (aqua #00a7d3 / royal #1670d9 / #0742ab / deep
+     #053c86) flattened to its own darkest stop, #053c86 solid. White
+     copy on it is 10.52:1; the button blue #1a7fd6 keeps a 2.53 step of
+     separation. Everything else on the band (border, radius, shadow,
+     padding, button rules) untouched. */
   display: flex;
   align-items: center;
   gap: 40px;
-  background: linear-gradient(125deg, #00a7d3 0%, #1670d9 48%, #0742ab 72%, #053c86 100%);
+  background: #053c86;  /* flat: Arbo 2026-09-24, "remove the gradient on the Claim band" */
   border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 12px;
   box-shadow:
@@ -2102,7 +2181,7 @@ fieldset.field legend {
 }
 
 .copy-phone-number:hover {
-  color: var(--accent);
+  color: var(--deep);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -2846,8 +2925,59 @@ fieldset.field legend {
   background: var(--accent-soft);
 }
 
+.owner-plan-cta-offer {
+  background: var(--offer);
+}
+
+.owner-plan-cta-offer:hover {
+  background: var(--offer-hover);
+}
+
 .owner-plan-cta-deep {
   background: var(--deep);
+}
+
+/* Promotional-edge pass 2026-09-24 (Arbo, variants 1+2+3).
+   --offer (rust) is the money-path color: the hero claim button, the
+   claim-help "Find your business" CTA, and the Premium plan card. Nothing
+   else may use it (scarcity is the signal; the gate asserts the decl count).
+   The claim band (.landing-claim-card and its button) is FROZEN for a
+   separate later edit and is deliberately absent here. */
+.landing-btn-offer {
+  background: var(--offer);
+  color: #fff;
+}
+
+.landing-btn-offer:hover {
+  background: var(--offer-hover);
+}
+
+/* The hero claim CTA uses the shared .landing-btn-offer as-is (solid rust
+   pill, white label). Arbo walked it through outlined variants today and
+   landed back on the full fill (2026-09-24, "make that button pill to
+   rust"); an earlier hero-only override was removed, not inverted. */
+
+/* Premium plan card: the one treated card (deliberate imbalance). Flag +
+   rust top border + lifted shadow; its CTA gets .landing-btn-offer /
+   .owner-plan-cta-offer at the markup level. */
+.owner-plan-card--offer {
+  position: relative;
+  border-top-color: var(--offer);
+  box-shadow: 0 10px 26px -10px rgba(10, 20, 40, 0.35);
+}
+
+.plan-flag {
+  position: absolute;
+  top: -11px;
+  left: 14px;
+  background: var(--offer);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  text-transform: uppercase;
 }
 
 .owner-plan-cta-deep:hover {

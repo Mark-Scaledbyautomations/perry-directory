@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { LISTINGS } from '../data/listings'
+import { useListings } from '../data/useListings'
 import { CATEGORIES } from '../data/categories'
 import { BRAND_CITY, BRAND_STATE_FULL } from '../data/brand'
 import { ClaimMapChip } from '../components/ClaimMapChip'
@@ -10,9 +10,8 @@ import { ClaimMapChip } from '../components/ClaimMapChip'
 // businesses" anchor band. Stats are derived from LISTINGS at render so they
 // stay true when data or photos change. Copy is placeholder-marked pending
 // brand decisions.
-const totalListings = LISTINGS.length
-const photosCount = LISTINGS.filter((l) => l.image).length
-const categoryCount = CATEGORIES.length
+// (Stats and anchors are computed inside Landing() now that listings are
+// fetched lazily via useListings() rather than imported at module scope.)
 
 // The 8 anchor businesses in the credibility band, by slug, with the plain
 // category label shown under each name (display copy only; the underlying
@@ -29,12 +28,6 @@ const ANCHOR_SLUGS: { slug: string; label: string }[] = [
   { slug: 'kinetic', label: 'Marketing and media' },
   { slug: 'air-evac-lifeteam', label: 'Medical transport' },
 ]
-const anchors = ANCHOR_SLUGS.flatMap((a) => {
-  const l = LISTINGS.find((x) => x.slug === a.slug)
-  return l && l.image
-    ? [{ slug: l.slug, name: l.business_name, image: l.image, label: a.label }]
-    : []
-})
 
 // Anchor logos too faint (thin near-transparent art) to float on the navy
 // card sit on a white plate instead; see .landing-biz-logo--plate in CSS.
@@ -58,6 +51,17 @@ const CAT_PHOTOS: Record<string, string> = {
 }
 
 export function Landing() {
+  const [listings] = useListings()
+  const totalListings = listings.length
+  const photosCount = listings.filter((l) => l.image).length
+  const categoryCount = CATEGORIES.length
+  const anchors = ANCHOR_SLUGS.flatMap((a) => {
+    const l = listings.find((x) => x.slug === a.slug)
+    return l && l.image
+      ? [{ slug: l.slug, name: l.business_name, image: l.image, label: a.label }]
+      : []
+  })
+
   return (
     <div className="landing">
       <section className="landing-hero landing-hero-photo">
@@ -75,7 +79,9 @@ export function Landing() {
           <Link className="landing-btn landing-btn-primary" to="/directory">
             Browse the directory
           </Link>
-          <Link className="landing-btn landing-btn-secondary" to="/claim-help">
+          {/* Promotional-edge pass 2026-09-24 (Arbo, variant 2): the claim
+              CTA carries the scarce offer color; Browse stays azure. */}
+          <Link className="landing-btn landing-btn-offer" to="/claim-help">
             Claim your business listing
           </Link>
         </div>
@@ -114,7 +120,7 @@ export function Landing() {
         </p>
         <ul className="landing-category-grid">
           {CATEGORIES.map((c) => {
-            const count = LISTINGS.filter((l) => l.category_slug === c.slug).length
+            const count = listings.filter((l) => l.category_slug === c.slug).length
             const photo = CAT_PHOTOS[c.slug]
             return (
               <li key={c.slug}>

@@ -41,6 +41,50 @@ function AdminNavCta() {
   )
 }
 
+// Header nav with a "you are here" marker: whichever entry owns the current
+// route turns its FONT gold #f59f00, nothing else added (Arbo's correction;
+// the pill keeps a white label + 1px gold edge instead, gold-on-azure text
+// would fail contrast). Route map: Directory owns /directory + listing
+// pages; Categories owns the category pages only (Arbo: landing must NOT
+// light it, 2026-09-24); For Business Owners owns the claim guide +
+// pricing; the pill owns /add.
+const NAV_ROUTES: Record<string, string[]> = {
+  '/directory': ['/directory', '/listing'],
+  '/#categories': ['/category'],
+  '/claim-help': ['/claim-help', '/pricing'],
+  '/add': ['/add'],
+}
+function navIsHere(to: string, pathname: string) {
+  return (NAV_ROUTES[to] ?? [to]).some(
+    (r) => pathname === r || (r !== '/' && pathname.startsWith(r + '/')),
+  )
+}
+function SiteNav() {
+  const { pathname } = useLocation()
+  // "You are here": the route-owning entry's FONT turns gold, nothing else
+  // changes (Arbo's correction, 2026-09-24). The pill keeps its pale chip
+  // exactly as the offer-colors pass built it.
+  const cls = (to: string, base?: string) => {
+    const here = navIsHere(to, pathname)
+    return base ? (here ? `${base} nav-here` : base) : here ? 'nav-here' : undefined
+  }
+  const text = (to: string, label: string) => (
+    <Link className={cls(to)} to={to}>
+      {label}
+    </Link>
+  )
+  return (
+    <>
+      {text('/directory', 'Directory')}
+      {text('/#categories', 'Categories')}
+      {text('/claim-help', 'For Business Owners')}
+      <Link className={cls('/add', 'nav-cta')} to="/add">
+        Add Your Business
+      </Link>
+    </>
+  )
+}
+
 // Tab title per route. App used to set BRAND_NAME once on mount, which ran
 // after child page effects and overwrote them (React runs child effects
 // first). This syncs on every navigation instead: pages that manage their
@@ -164,12 +208,7 @@ export default function App() {
           </Link>
           <nav className="site-nav">
             <AdminNavCta />
-            <Link to="/directory">Directory</Link>
-            <Link to="/#categories">Categories</Link>
-            <Link to="/claim-help">For Business Owners</Link>
-            <Link className="nav-cta" to="/add">
-              Add Your Business
-            </Link>
+            <SiteNav />
           </nav>
         </header>
 

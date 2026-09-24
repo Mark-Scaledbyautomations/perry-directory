@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { LISTINGS } from '../data/listings'
+import { useListings } from '../data/useListings'
+import type { Listing } from '../data/listings'
 import { CATEGORIES } from '../data/categories'
 import { isAdminMode, SCOPE_LABEL, WEBSITE_STATUS_LABEL } from '../components/ListingCard'
 import { isAeoDescription } from '../components/DescriptionBlock'
@@ -33,6 +34,7 @@ function pct(n: number, total: number): string {
 export function Admin() {
   const [searchParams] = useSearchParams()
   const isAdmin = isAdminMode(searchParams)
+  const [listings] = useListings()
 
   // This page owns its title (paired with the RouteTitleSync skip in App.tsx)
   useEffect(() => {
@@ -40,9 +42,9 @@ export function Admin() {
   }, [])
 
   const stats = useMemo(() => {
-    const total = LISTINGS.length
-    const count = (pred: (l: (typeof LISTINGS)[number]) => boolean) =>
-      LISTINGS.filter(pred).length
+    const total = listings.length
+    const count = (pred: (l: Listing) => boolean) =>
+      listings.filter(pred).length
     const has = (v: string | null) => Boolean(v && v.trim())
 
     // KPI coverage (field non-empty across all listings).
@@ -90,9 +92,9 @@ export function Admin() {
 
     // Review lists, derived from the data (the artifact's names were
     // correct at run time; the source of truth is this computation).
-    const noPhone = LISTINGS.filter((l) => !has(l.phone))
-    const noStreet = LISTINGS.filter((l) => !has(l.street_address))
-    const emailGroups = computeEmailGroups()
+    const noPhone = listings.filter((l) => !has(l.phone))
+    const noStreet = listings.filter((l) => !has(l.street_address))
+    const emailGroups = computeEmailGroups(listings)
 
     return {
       total,
@@ -109,7 +111,7 @@ export function Admin() {
       noStreet,
       emailGroups,
     }
-  }, [])
+  }, [listings])
 
   if (!isAdmin) {
     return (
@@ -349,7 +351,7 @@ function StatPanel(props: { title: string; rows: { name: string; value: number }
 }
 
 // A review list of business names, each linking to its listing page.
-function NameList(props: { title: string; listings: typeof LISTINGS }) {
+function NameList(props: { title: string; listings: Listing[] }) {
   return (
     <div className="adm-panel">
       <h3 className="adm-review-title">{props.title}</h3>
@@ -366,20 +368,21 @@ function NameList(props: { title: string; listings: typeof LISTINGS }) {
   )
 }
 
-// Emails carried by more than one listing, in LISTINGS order. Derived, not
-// hardcoded: if the CSV changes, this list changes with it. (Currently 3
-// groups, all reviewed as legitimate multi-unit or branch cases.) Plain
-// function, not a hook: it is called inside the page's stats useMemo.
-function computeEmailGroups() {
-  const byEmail = new Map<string, typeof LISTINGS>()
-  for (const l of LISTINGS) {
+// Emails carried by more than one listing, in the passed list's order.
+// Derived, not hardcoded: if the CSV changes, this list changes with it.
+// (Currently 3 groups, all reviewed as legitimate multi-unit or branch
+// cases.) Plain function, not a hook: it is called inside the page's stats
+// useMemo.
+function computeEmailGroups(listings: Listing[]) {
+  const byEmail = new Map<string, Listing[]>()
+  for (const l of listings) {
     const e = (l.email || '').trim().toLowerCase()
     if (!e) continue
     const arr = byEmail.get(e) || []
     arr.push(l)
     byEmail.set(e, arr)
   }
-  const groups: { email: string; listings: typeof LISTINGS }[] = []
+  const groups: { email: string; listings: Listing[] }[] = []
   for (const [email, listings] of byEmail) {
     if (listings.length > 1) groups.push({ email, listings })
   }

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { LISTINGS } from '../data/listings'
+import { useListings } from '../data/useListings'
 import { categoryBySlug } from '../data/categories'
 import { SearchBar } from '../components/SearchBar'
 import { CategoryFilter } from '../components/CategoryFilter'
@@ -67,6 +67,7 @@ export function Home() {
   const [searchParams, setSearchParams] = useSearchParams()
   const isAdmin = isAdminMode(searchParams)
   const [query, setQuery] = useState('')
+  const [listings] = useListings()
 
   // URL-driven filter helpers. The update reads window.location.search at the
   // moment of the change, not the `searchParams` snapshot captured at render.
@@ -111,7 +112,7 @@ export function Home() {
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return LISTINGS.filter((l) => {
+    return listings.filter((l) => {
       if (category && l.category_slug !== category) return false
       if (scope && l.listing_scope !== scope) return false
       if (websiteStatus === 'none') {
@@ -146,7 +147,7 @@ export function Home() {
         ),
       )
     })
-  }, [query, category, scope, websiteStatus, descType])
+  }, [query, category, scope, websiteStatus, descType, listings])
 
   return (
     <div className="page">

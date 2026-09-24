@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { LISTINGS } from '../data/listings'
+import { useListings } from '../data/useListings'
 import { categoryBySlug } from '../data/categories'
 import { BRAND_CITY, BRAND_STATE_FULL } from '../data/brand'
 import { CopyPhone } from '../components/CopyPhone'
@@ -27,7 +27,8 @@ function mapsUrl(listing: { street_address: string | null; city: string; state: 
 // "More in {category}" related strip computed from LISTINGS at render.
 export function ListingDetail() {
   const { slug } = useParams<{ slug: string }>()
-  const listing = LISTINGS.find((l) => l.slug === slug)
+  const [listings, loaded] = useListings()
+  const listing = listings.find((l) => l.slug === slug)
   const [reported, setReported] = useState(false)
   const [descExpanded, setDescExpanded] = useState(false)
   const hasLongDesc = (listing?.description || '').length > 180
@@ -36,10 +37,23 @@ export function ListingDetail() {
   // Category page). App's RouteTitleSync skips /listing/ paths so it cannot
   // clobber this (React runs child effects first, parent effects after).
   useEffect(() => {
-    document.title = listing
-      ? `${listing.business_name} in ${BRAND_CITY}, ${BRAND_STATE_FULL} | Perry Business Directory`
-      : 'Listing not found | Perry Business Directory'
-  }, [listing])
+    document.title = !loaded
+      ? 'Loading | Perry Business Directory'
+      : listing
+        ? `${listing.business_name} in ${BRAND_CITY}, ${BRAND_STATE_FULL} | Perry Business Directory`
+        : 'Listing not found | Perry Business Directory'
+  }, [listing, loaded])
+
+  // Gate on loaded: during the sub-second fetch, listings is empty and every
+  // slug would falsely render "not found". Once the data is in, an unknown
+  // slug is a real miss.
+  if (!loaded) {
+    return (
+      <div className="page">
+        <h1 className="page-title">Loading listing</h1>
+      </div>
+    )
+  }
 
   if (!listing) {
     return (
@@ -55,7 +69,7 @@ export function ListingDetail() {
   const category = categoryBySlug(listing.category_slug)
   const categoryName = category ? category.name : listing.category_slug
   const related = category
-    ? LISTINGS.filter(
+    ? listings.filter(
         (l) => l.category_slug === category.slug && l.slug !== listing.slug
       )
         // Logo-bearing siblings first (cards look complete), then stable by

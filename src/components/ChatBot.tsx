@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { LISTINGS, type Listing } from '../data/listings'
+import { useListings } from '../data/useListings'
+import type { Listing } from '../data/listings'
 import { CATEGORIES, categoryBySlug } from '../data/categories'
 
 // The category slugs are the 9 verified values in src/data/categories.ts. The
@@ -77,10 +78,10 @@ function scoreListing(listing: Listing, query: string): number {
   return score
 }
 
-function topMatches(query: string, limit = 3): Listing[] {
+function topMatches(listings: Listing[], query: string, limit = 3): Listing[] {
   const q = query.trim()
   if (!q) return []
-  return LISTINGS.map((l) => ({ l, s: scoreListing(l, q) }))
+  return listings.map((l) => ({ l, s: scoreListing(l, q) }))
     .filter((x) => x.s > 0)
     .sort((a, b) => b.s - a.s)
     .slice(0, limit)
@@ -97,6 +98,7 @@ interface Message {
 const QUICK_REPLIES = ['Find a business', 'Browse categories', 'Contact us', 'I own a business']
 
 export function ChatBot() {
+  const [listings] = useListings()
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<Message[]>([
@@ -124,7 +126,7 @@ export function ChatBot() {
         text: 'You can reach us through the "How to claim your listing" page in the footer, or by claiming a listing. There is no phone or email on file yet.',
       })
     } else {
-      const matches = topMatches(text)
+      const matches = topMatches(listings, text)
       if (matches.length === 0) {
         next.push({
           from: 'bot',

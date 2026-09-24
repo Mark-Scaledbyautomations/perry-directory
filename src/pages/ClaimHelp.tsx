@@ -9,48 +9,9 @@
 
 import { useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { PRICING_TIERS } from '../data/pricing'
 import { CouponRow, useFoundingCoupon } from '../components/FoundingCoupon'
 
-// Plan cards for this guide (Arbo 2026-09-19: Klamath format, Set D colors).
-// Prices + feature lines come from data/pricing.ts (single source, same
-// values the pricing page shows); the one-liner and CTA are page copy.
-// The Managed Growth CTA opens the real chat widget (the reference's
-// "Chat with us" button does the same); it is a button, not a link.
-const PLAN_META: Record<
-  string,
-  { desc: string; ctaLabel: string; ctaTo?: string; chat?: boolean }
-> = {
-  'Free Listing': {
-    desc: 'Claim and correct your business listing. No purchase is required, ever.',
-    ctaLabel: 'Claim your free listing',
-    ctaTo: '/directory',
-  },
-  'Featured Listing': {
-    desc: 'Stand out where customers are already looking. $99 your first year, a discount from $250.',
-    ctaLabel: 'Claim first, then upgrade',
-    ctaTo: '/directory',
-  },
-  'Premium Listing': {
-    desc: 'Everything in Featured plus hands-on help.',
-    ctaLabel: 'Claim first, then upgrade',
-    ctaTo: '/directory',
-  },
-  'Managed Growth Package': {
-    desc: 'We run your online presence so you can run your business.',
-    ctaLabel: 'Chat with us',
-    chat: true,
-  },
-}
-
-const PLANS = PRICING_TIERS.map((tier) => ({ tier, ...PLAN_META[tier.name] }))
-
-function openChat() {
-  // The fab TOGGLES, so blind-clicking it would close an already-open
-  // panel. Check first: the card CTA's job is "show the chat", idempotent.
-  if (document.querySelector('.chatbot-panel')) return
-  document.querySelector<HTMLButtonElement>('.chatbot-fab')?.click()
-}
+import { PlanCards } from '../components/PlanCards'
 
 export function ClaimHelp() {
   const c = useFoundingCoupon()
@@ -89,56 +50,7 @@ export function ClaimHelp() {
           applied={c.applied}
           successText="Founding member price applied to the Premium plan below."
         />
-        <div className="owner-plans">
-          {PLANS.map((p) => {
-            const showFounding = c.applied && p.tier.foundingPrice
-            return (
-            <div key={p.tier.name} className="owner-plan-card">
-              <p className="owner-plan-name">{p.tier.name}</p>
-              <p className="owner-plan-desc">{p.desc}</p>
-              <p className="owner-plan-price">
-                {showFounding ? p.tier.foundingPrice : p.tier.price}
-                {(showFounding ? p.tier.price : p.tier.wasPrice) && (
-                  <span className="owner-plan-was">
-                    {showFounding ? p.tier.price : p.tier.wasPrice}
-                  </span>
-                )}
-              </p>
-              <p className="owner-plan-period">{p.tier.period}</p>
-              {showFounding && (
-                <p className="pricing-founding">
-                  Founding member price for the first year.
-                </p>
-              )}
-              <ul className="owner-plan-features">
-                {p.tier.features.map((f) => (
-                  <li key={f}>{f}</li>
-                ))}
-              </ul>
-              {p.chat ? (
-                <button
-                  type="button"
-                  className="owner-plan-cta owner-plan-cta-deep"
-                  onClick={openChat}
-                >
-                  {p.ctaLabel}
-                </button>
-              ) : (
-                <Link
-                  className={
-                    p.tier.name === 'Free Listing'
-                      ? 'owner-plan-cta owner-plan-cta-free'
-                      : 'owner-plan-cta'
-                  }
-                  to={p.ctaTo ?? '/directory'}
-                >
-                  {p.ctaLabel}
-                </Link>
-              )}
-            </div>
-            )
-          })}
-        </div>
+        <PlanCards applied={c.applied} />
       </section>
 
       <section className="landing-hero" aria-labelledby="claim-help-heading">
@@ -152,7 +64,9 @@ export function ClaimHelp() {
           no one else can change it.
         </p>
         <div className="landing-hero-actions">
-          <Link className="landing-btn landing-btn-primary" to="/directory">
+          {/* Promotional-edge pass 2026-09-24 (Arbo, variant 2): the one
+              real action on this page carries the offer color. */}
+          <Link className="landing-btn landing-btn-offer" to="/directory">
             Find your business
           </Link>
         </div>

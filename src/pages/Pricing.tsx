@@ -1,10 +1,19 @@
 import { PRICING_TIERS } from '../data/pricing'
 import { CouponRow, useFoundingCoupon } from '../components/FoundingCoupon'
+import { PlanCards } from '../components/PlanCards'
 
 // Pricing ladder page. Comparison only: no checkout, no payment. Values are
-// the exact verified ladder from the Klamath Falls build. The founding-member
-// coupon lives in the shared FoundingCoupon component (the business-owners
-// guide uses the same one), so the code and reveal cannot drift between pages.
+// the exact verified ladder from the Klamath Falls build. The cards render
+// through the shared PlanCards component (extracted from the business-owners
+// guide, 2026-09-24, Arbo: this page must match that design), so the two
+// pages cannot drift; prices and feature lines stay from data/pricing.ts.
+// This page keeps the extra monthly-payment note (comparison detail the
+// guide omits).
+
+// Monthly-payment fine print, keyed by tier name; from PRICING_TIERS.
+const MONTHLY_NOTES: Record<string, string> = Object.fromEntries(
+  PRICING_TIERS.filter((t) => t.monthlyNote).map((t) => [t.name, t.monthlyNote!]),
+)
 
 export function Pricing() {
   const c = useFoundingCoupon()
@@ -26,34 +35,7 @@ export function Pricing() {
         successText="Founding member price applied to the Premium Listing."
       />
 
-      <div className="pricing-grid">
-        {PRICING_TIERS.map((tier) => {
-          const showFounding = c.applied && tier.foundingPrice
-          return (
-            <div key={tier.name} className="pricing-card">
-              <h2 className="pricing-name">{tier.name}</h2>
-              <p className="pricing-price">
-                {showFounding ? tier.foundingPrice : tier.price}
-                {showFounding && (
-                  <span className="pricing-was"> {tier.price}</span>
-                )}
-                {!showFounding && tier.wasPrice && (
-                  <span className="pricing-was"> {tier.wasPrice}</span>
-                )}
-              </p>
-              <p className="pricing-period">{tier.period}</p>
-              {tier.monthlyNote && (
-                <p className="pricing-note">{tier.monthlyNote}</p>
-              )}
-              {showFounding && (
-                <p className="pricing-founding">
-                  Founding member price for the first year.
-                </p>
-              )}
-            </div>
-          )
-        })}
-      </div>
+      <PlanCards applied={c.applied} extraNotes={MONTHLY_NOTES} />
     </div>
   )
 }
