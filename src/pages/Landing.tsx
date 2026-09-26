@@ -116,7 +116,8 @@ export function Landing() {
       <section id="categories" className="landing-section" aria-labelledby="landing-categories-heading">
         <h2 id="landing-categories-heading">Browse by category</h2>
         <p className="landing-section-sub">
-          Nine categories cover all {totalListings} listings in the directory.
+          {categoryCount} categories cover all {totalListings} listings in the
+          directory.
         </p>
         <ul className="landing-category-grid">
           {CATEGORIES.map((c) => {

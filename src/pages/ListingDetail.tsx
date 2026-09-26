@@ -5,6 +5,7 @@ import { categoryBySlug } from '../data/categories'
 import { BRAND_CITY, BRAND_STATE_FULL } from '../data/brand'
 import { CopyPhone } from '../components/CopyPhone'
 import { DescriptionBlock } from '../components/DescriptionBlock'
+import { MapView } from '../components/MapView'
 
 // Plain-English label form of a category name ("Restaurants & Food" becomes
 // "Restaurants and Food"). Same display rule the Category page uses, kept in
@@ -13,13 +14,19 @@ function displayName(name: string): string {
   return name.replace(/&/g, 'and')
 }
 
-// Google Maps link built from the listing's own street address text (a
-// search-URL, not a coordinate pin: the dataset has no lat/lng, verified
-// 2026-09-18, so a pinned map would be a claim we cannot back).
-function mapsUrl(listing: { street_address: string | null; city: string; state: string; zip_code: string | null }): string {
-  const parts = [listing.street_address, `${listing.city}, ${listing.state}`, listing.zip_code].filter(Boolean)
+// Google Maps link. When the listing carries a coordinate, link straight to
+// the pin (the reference build's shape); otherwise search by business name
+// plus address so Google resolves the named listing, not a bare address pin.
+function mapsUrl(listing: { business_name: string; street_address: string | null; city: string; state: string; zip_code: string | null; latitude: number | null; longitude: number | null }): string {
+  if (listing.latitude !== null && listing.longitude !== null) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${listing.latitude},${listing.longitude}`
+  }
+  const parts = [listing.business_name, listing.street_address, `${listing.city}, ${listing.state}`].filter(Boolean)
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parts.join(' '))}`
 }
+
+const hasCoords = (l: { latitude: number | null; longitude: number | null }) =>
+  l.latitude !== null && l.longitude !== null
 
 // Piece (c) listing-detail enhancements, ported from OpenDesign artifact
 // listing-detail-template.html (perry-landing-ui-758e, 2026-09-18):
@@ -127,6 +134,10 @@ export function ListingDetail() {
         >
           {descExpanded ? 'See less' : 'See more'}
         </button>
+      )}
+
+      {hasCoords(listing) && (
+        <MapView latitude={listing.latitude!} longitude={listing.longitude!} />
       )}
 
       <dl className="detail-list">

@@ -23,6 +23,11 @@
   --offer: #c2410c;
   --offer-hover: #ab390b;
   --accent-hover: #164ab3;
+  /* Footer navy (promoted 2026-09-26, Arbo): the reference build's hero navy
+     measured pixel-for-pixel from Arbo's screenshot as #1b3a5c. Was raw hex
+     in .site-footer since 2026-09-23; Arbo promoted it to a token so the
+     shade is reusable. White text 11.63:1, --pale links 9.26:1. */
+  --footer-navy: #1b3a5c;
 }
 
 * {
@@ -178,11 +183,10 @@ body {
   /* 4-column footer (2026-09-18): full-bleed navy like the reference
      build. Rendered outside .app (see App.tsx), so it spans the viewport
      naturally. 2026-09-23: background is the reference build's hero navy
-     measured pixel-for-pixel from Arbo's screenshot: #1B3A5C (was one
-     step of Set D, --mid). Raw hex is the honest match; promoting it to
-     a token is Arbo's call (same rule as the claim-band measured colors).
-     White text 11.63:1, --pale links 9.26:1 on this shade. */
-  background: #1b3a5c;
+     measured pixel-for-pixel from Arbo's screenshot. 2026-09-26: promoted
+     to the --footer-navy token (Arbo). White text 11.63:1, --pale links
+     9.26:1 on this shade. */
+  background: var(--footer-navy);
   color: #ffffff;
   padding: 48px 0 24px;
   font-size: 14px;
@@ -923,6 +927,18 @@ fieldset.field legend {
 .consent-body {
   font-size: 13px;
   color: var(--muted);
+}
+
+/* Terms and privacy links inside the Agreement card (and its preview on the
+   claim-help page) used to fall back to the browser's default blue. They now
+   carry the site's inline-link style: navy, underlined, same as .back-link.
+   Azure stays reserved for real actions, so these reference links read as
+   links without competing with the CTAs. */
+.consent-body a,
+.form-ask a {
+  color: var(--deep);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .consent-meta {
@@ -2192,6 +2208,20 @@ fieldset.field legend {
   margin-top: 4px;
   font-size: 14px;
   font-weight: 600;
+}
+
+/* Embedded map on listing detail (Leaflet + OpenStreetMap tiles) */
+.map-view {
+  height: 260px;
+  width: 100%;
+  margin: 16px 0 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--pale);
+}
+.map-view .leaflet-container {
+  height: 100%;
+  width: 100%;
 }
 
 /* "More in {category}" related strip */

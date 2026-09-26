@@ -312,9 +312,9 @@ export function Admin() {
               <p className="adm-review-note">
                 The {stats.emailGroups.length}{' '}
                 {stats.emailGroups.length === 1 ? 'group was' : 'groups were'}{' '}
-                checked by hand during the {SNAPSHOT_DATE} data pass. Each one
-                is a legitimate multi-unit or branch case, so they stay on
-                this page for the record.
+                checked by hand during the 2026-09-15 data pass. Each one is a
+                legitimate multi-unit or branch case, so they stay on this page
+                for the record.
               </p>
             </div>
           </div>
