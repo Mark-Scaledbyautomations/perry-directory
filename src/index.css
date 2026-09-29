@@ -34,6 +34,23 @@
   box-sizing: border-box;
 }
 
+html {
+  /* Sticky header (measured 81px desktop) would otherwise cover the target
+     of every anchor jump: HashScroll's scrollIntoView, landing #categories,
+     and the claim CTAs' /claim-help#claim-help-heading (Arbo 2026-09-29: the
+     two landing claim buttons must land ON the "How to claim your listing"
+     section, not on the plans block above it). One rule fixes the whole bug
+     class for every scroll target, native or scripted. At <=640 the header
+     wraps to two rows (measured 153px at 390), so the pad grows with it. */
+  scroll-padding-top: 96px;
+}
+
+@media (max-width: 640px) {
+  html {
+    scroll-padding-top: 168px;
+  }
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,

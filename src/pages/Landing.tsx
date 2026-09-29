@@ -81,7 +81,7 @@ export function Landing() {
           </Link>
           {/* Promotional-edge pass 2026-09-24 (Arbo, variant 2): the claim
               CTA carries the scarce offer color; Browse stays azure. */}
-          <Link className="landing-btn landing-btn-offer" to="/claim-help">
+          <Link className="landing-btn landing-btn-offer" to="/claim-help#claim-help-heading">
             Claim your business listing
           </Link>
         </div>
@@ -226,7 +226,7 @@ export function Landing() {
             </p>
           </div>
           <div className="landing-claim-cta">
-            <Link className="landing-btn landing-btn-primary" to="/claim-help">
+            <Link className="landing-btn landing-btn-primary" to="/claim-help#claim-help-heading">
               Claim your listing
             </Link>
             <ul className="landing-claim-pts">

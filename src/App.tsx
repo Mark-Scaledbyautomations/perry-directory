@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Link, useLocation, useSearchParams } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
+import { BrowserRouter, Routes, Route, Link, useLocation, useNavigationType, useSearchParams } from 'react-router-dom'
 import { BRAND_NAME } from './data/brand'
 import { CATEGORIES } from './data/categories'
 import { isAdminMode } from './components/ListingCard'
@@ -120,6 +120,31 @@ function HashScroll() {
   return null
 }
 
+// Returns to the top on real route pushes (BrowserRouter preserves the old
+// scroll offset into the new page; Arbo 2026-09-29: claim-help's "Find your
+// business" landed mid-grid instead of on the "Find a business in Perry"
+// head). Two conditions, one per bug class: PUSH skips back/forward (the
+// browser restores its own position there), and the pathname-change ref skips
+// same-path writes (Home's filter dropdowns setSearchParams on the same
+// path; a reset there jumped the grid). Empirically react-router v7 reports
+// those replace writes in a way that tripped a navType-only guard, so both
+// guards stand. Same-route hash jumps have an unchanged path and never reset
+// here; HashScroll owns those. When a push DOES change path and hash
+// (Categories from another page), this effect runs first by mount order and
+// HashScroll then pins the target.
+function ScrollReset() {
+  const { pathname } = useLocation()
+  const navType = useNavigationType()
+  const prevPath = useRef(pathname)
+  useEffect(() => {
+    if (navType === 'PUSH' && pathname !== prevPath.current) {
+      window.scrollTo(0, 0)
+    }
+    prevPath.current = pathname
+  }, [pathname, navType])
+  return null
+}
+
 function SiteFooter() {
   // Keep the claim-help back-link behavior: arriving from a listing page
   // sends you back there (ClaimHelp reads ?from=).
@@ -200,6 +225,7 @@ export default function App() {
     <BrowserRouter basename={import.meta.env.VITE_BASE || '/'}>
       <AdminFlagSync />
       <RouteTitleSync />
+      <ScrollReset />
       <HashScroll />
       <div className="app">
         <header className="site-header">
