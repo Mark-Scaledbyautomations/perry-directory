@@ -6,6 +6,7 @@ import { BRAND_CITY, BRAND_STATE_FULL } from '../data/brand'
 import { CopyPhone } from '../components/CopyPhone'
 import { DescriptionBlock } from '../components/DescriptionBlock'
 import { MapView } from '../components/MapView'
+import { TierBadge } from '../components/ListingCard'
 
 // Plain-English label form of a category name ("Restaurants & Food" becomes
 // "Restaurants and Food"). Same display rule the Category page uses, kept in
@@ -110,6 +111,7 @@ export function ListingDetail() {
           </div>
         )}
         <div className="detail-titleblock">
+          <TierBadge tier={listing.listing_tier} />
           <h1 className="page-title">{listing.business_name}</h1>
           <p className="listing-category">
             <Link

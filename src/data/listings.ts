@@ -4,7 +4,7 @@
 // runtime via useListings(); this file carries only the types.
 // Regenerate with: python scripts/gen_listings.py
 
-export type ListingTier = 'free' | 'premium'
+export type ListingTier = 'free' | 'featured' | 'premium'
 export type ClaimStatus = 'unclaimed' | 'claimed'
 export type ListingScope = 'local-independent' | 'local-franchisee' | 'corporate-location'
 export type WebsiteStatus = '' | 'broken' | 'domain-lost' | 'rebranded' | 'platform-link'

@@ -4,7 +4,7 @@ import { useListings } from '../data/useListings'
 import { categoryBySlug } from '../data/categories'
 import { SearchBar } from '../components/SearchBar'
 import { CategoryFilter } from '../components/CategoryFilter'
-import { ListingCard, isAdminMode, SCOPE_LABEL, WEBSITE_STATUS_LABEL, DESCRIPTION_TYPE_LABEL } from '../components/ListingCard'
+import { ListingCard, isAdminMode, tierRank, SCOPE_LABEL, WEBSITE_STATUS_LABEL, DESCRIPTION_TYPE_LABEL } from '../components/ListingCard'
 import { isAeoDescription } from '../components/DescriptionBlock'
 
 // Crude plural/agent stems so "plumber" matches "Plumbing" and "restaurants"
@@ -112,7 +112,7 @@ export function Home() {
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return listings.filter((l) => {
+    const matched = listings.filter((l) => {
       if (category && l.category_slug !== category) return false
       if (scope && l.listing_scope !== scope) return false
       if (websiteStatus === 'none') {
@@ -147,6 +147,9 @@ export function Home() {
         ),
       )
     })
+    // Paid tiers first (premium, then featured), stable inside each tier. The
+    // admin review view renders this same grid, so it sorts the same way.
+    return matched.sort((a, b) => tierRank(a.listing_tier) - tierRank(b.listing_tier))
   }, [query, category, scope, websiteStatus, descType, listings])
 
   return (

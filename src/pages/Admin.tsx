@@ -86,6 +86,7 @@ export function Admin() {
     ]
 
     const premium = count((l) => l.listing_tier === 'premium')
+    const featured = count((l) => l.listing_tier === 'featured')
     const claimed = count((l) => l.claim_status === 'claimed')
     const freeTier = count((l) => l.listing_tier === 'free')
     const unclaimed = count((l) => l.claim_status === 'unclaimed')
@@ -104,6 +105,7 @@ export function Admin() {
       byScope,
       byDescription,
       premium,
+      featured,
       freeTier,
       claimed,
       unclaimed,
@@ -208,6 +210,12 @@ export function Admin() {
                   style={{ width: `${(stats.premium / stats.total) * 100}%` }}
                 />
               )}
+              {stats.featured > 0 && (
+                <div
+                  className="adm-mix-seg adm-mix-seg-featured"
+                  style={{ width: `${(stats.featured / stats.total) * 100}%` }}
+                />
+              )}
               <div
                 className="adm-mix-seg adm-mix-seg-free"
                 style={{ width: `${(stats.freeTier / stats.total) * 100}%` }}
@@ -223,6 +231,13 @@ export function Admin() {
               </li>
               <li className="adm-stat-row">
                 <span className="adm-stat-name adm-legend">
+                  <span className="adm-swatch adm-swatch-featured" aria-hidden="true" />
+                  Featured
+                </span>
+                <span className="adm-stat-num">{stats.featured}</span>
+              </li>
+              <li className="adm-stat-row">
+                <span className="adm-stat-name adm-legend">
                   <span className="adm-swatch adm-swatch-free" aria-hidden="true" />
                   Free
                 </span>
@@ -230,8 +245,8 @@ export function Admin() {
               </li>
             </ul>
             <p className="adm-zero-note">
-              {stats.premium === 0
-                ? 'No listing is on a premium package yet. The bar fills as owners buy packages.'
+              {stats.premium === 0 && stats.featured === 0
+                ? 'No listing is on a paid plan yet (Featured or Premium). The bar fills as owners buy packages.'
                 : 'Share of listings on each plan, from the directory data.'}
             </p>
           </div>

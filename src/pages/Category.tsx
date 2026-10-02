@@ -4,6 +4,7 @@ import { useListings } from '../data/useListings'
 import { categoryBySlug } from '../data/categories'
 import { BRAND_CITY, BRAND_STATE_FULL } from '../data/brand'
 import { ClaimMapChip } from '../components/ClaimMapChip'
+import { tierRank } from '../components/ListingCard'
 
 // Category pages (UI buildout piece b). Port of the OpenDesign
 // category-template.html run (2026-09-16) into the app shell. Route is
@@ -23,7 +24,10 @@ export function Category() {
   const [listings] = useListings()
   const category = categoryBySlug(slug)
   const listingsInCat = category
-    ? listings.filter((l) => l.category_slug === category.slug)
+    ? listings
+        .filter((l) => l.category_slug === category.slug)
+        // Paid tiers first (premium, then featured), stable inside each tier.
+        .sort((a, b) => tierRank(a.listing_tier) - tierRank(b.listing_tier))
     : []
 
   useEffect(() => {

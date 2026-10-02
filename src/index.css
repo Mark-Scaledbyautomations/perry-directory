@@ -688,6 +688,17 @@ body {
   color: var(--deep);
 }
 
+.badge-featured {
+  background: var(--deep);
+  color: #fff;
+}
+
+/* The detail page places the tier badge above the business name. */
+.detail-titleblock .badge {
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
 .badge-scope {
   background: #f3f4f6;
   color: var(--muted);
@@ -2623,6 +2634,7 @@ fieldset.field legend {
 }
 .adm-mix-seg { height: 100%; }
 .adm-mix-seg-paid { background: var(--accent); }
+.adm-mix-seg-featured { background: var(--deep); }
 .adm-mix-seg-free { background: var(--pale); }
 .adm-legend { display: inline-flex; align-items: center; gap: 7px; }
 .adm-swatch {
@@ -2632,6 +2644,7 @@ fieldset.field legend {
   display: inline-block;
 }
 .adm-swatch-paid { background: var(--accent); }
+.adm-swatch-featured { background: var(--deep); }
 .adm-swatch-free { background: var(--pale); border: 1px solid var(--line); }
 .adm-zero-note {
   margin: 0;

@@ -42,6 +42,26 @@ export const DESCRIPTION_TYPE_LABEL: Record<string, string> = {
   plain: 'Plain',
 }
 
+// Paid-tier badge. One tier per listing, so a featured and a premium badge
+// never both render. Public, like the Premium badge: a paid listing's badge
+// is also the label that the placement is paid.
+const TIER_BADGE: Partial<Record<Listing['listing_tier'], { label: string; cls: string }>> = {
+  featured: { label: 'Featured', cls: 'badge-featured' },
+  premium: { label: 'Premium', cls: 'badge-premium' },
+}
+
+export function TierBadge({ tier }: { tier: Listing['listing_tier'] }) {
+  const b = TIER_BADGE[tier]
+  return b ? <span className={`badge ${b.cls}`}>{b.label}</span> : null
+}
+
+// Placement rank: paid tiers above free, premium above featured. Used by the
+// directory grid, the category pages, and the admin review view (which renders
+// the same grid). Array.prototype.sort is stable, so listings keep their current
+// order inside each tier.
+export const tierRank = (tier: Listing['listing_tier']): number =>
+  tier === 'premium' ? 0 : tier === 'featured' ? 1 : 2
+
 export function ListingCard({ listing }: { listing: Listing }) {
   const category = categoryBySlug(listing.category_slug)
   const [expanded, setExpanded] = useState(false)
@@ -62,9 +82,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
             {listing.business_name}
           </Link>
         </h3>
-        {listing.listing_tier === 'premium' && (
-          <span className="badge badge-premium">Premium</span>
-        )}
+        <TierBadge tier={listing.listing_tier} />
         {isAdmin && listing.listing_scope !== 'local-independent' && (
           <span className={`badge badge-scope badge-scope-${listing.listing_scope}`}>
             {SCOPE_LABEL[listing.listing_scope]}
