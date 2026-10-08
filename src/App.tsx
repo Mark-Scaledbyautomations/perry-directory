@@ -15,6 +15,7 @@ import { Privacy } from './pages/Privacy'
 import { ClaimHelp } from './pages/ClaimHelp'
 import { Admin } from './pages/Admin'
 import { ChatBot } from './components/ChatBot'
+import { PUBLIC_SHELL } from './data/useListings'
 
 // Pins the hidden ?admin=1 review flag to sessionStorage on ANY entry page.
 // Admin mode used to be detected only on the directory grid (Home), so it
@@ -239,6 +240,13 @@ export default function App() {
         </header>
 
         <main className="site-main">
+          {PUBLIC_SHELL && (
+            <div className="public-shell-banner" role="status">
+              Public review shell only. Business listings are intentionally not
+              included in this build. The private local preview loads the
+              working directory data.
+            </div>
+          )}
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/directory" element={<Home />} />
@@ -256,7 +264,7 @@ export default function App() {
           </Routes>
         </main>
 
-        <ChatBot />
+      {!PUBLIC_SHELL && <ChatBot />}
       </div>
       {/* Footer sits OUTSIDE the .app width cap: full-bleed navy bar with
           its own centered column, no 100vw scrollbar hack needed. */}

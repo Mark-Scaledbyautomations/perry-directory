@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { useListings } from '../data/useListings'
+import { PUBLIC_SHELL, useListings } from '../data/useListings'
 import { categoryBySlug } from '../data/categories'
 import { BRAND_CITY, BRAND_STATE_FULL } from '../data/brand'
 import { ClaimMapChip } from '../components/ClaimMapChip'
@@ -23,6 +23,23 @@ export function Category() {
   const { slug = '' } = useParams()
   const [listings] = useListings()
   const category = categoryBySlug(slug)
+
+  if (PUBLIC_SHELL) {
+    return (
+      <div className="page">
+        <h1 className="page-title">
+          {category ? `${displayName(category.name)} review route` : 'Category not found'}
+        </h1>
+        <p className="page-sub">
+          Business listing data is intentionally excluded from this public
+          build. The private local preview contains the category records.
+        </p>
+        <Link className="btn btn-primary" to="/pricing">
+          View the pricing flow
+        </Link>
+      </div>
+    )
+  }
   const listingsInCat = category
     ? listings
         .filter((l) => l.category_slug === category.slug)

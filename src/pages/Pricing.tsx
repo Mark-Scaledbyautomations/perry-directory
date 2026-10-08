@@ -36,6 +36,31 @@ export function Pricing() {
       />
 
       <PlanCards applied={c.applied} extraNotes={MONTHLY_NOTES} />
+
+      <section className="upgrade-path">
+        <h2 className="upgrade-path-title">How the upgrade path works</h2>
+        <ol className="upgrade-path-steps">
+          <li>
+            <strong>Claim free.</strong> Verify ownership and fix your listing.
+            Marketing consent is optional and separate; claiming never
+            requires it.
+          </li>
+          <li>
+            <strong>Go Featured when it makes sense.</strong> $99 for your
+            first year puts you at the top of your category with a bigger
+            profile, a discount from $250 a year.
+          </li>
+          <li>
+            <strong>Hand it all to us if you'd rather.</strong> The Managed
+            Growth Package covers your website, Google Business Profile, and
+            local-search work for about $125 a month after setup.
+          </li>
+        </ol>
+        <p className="upgrade-path-note">
+          The next step for the Managed Growth Package is the site chat. No
+          outbound sales contact happens unless you've explicitly opted in.
+        </p>
+      </section>
     </div>
   )
 }

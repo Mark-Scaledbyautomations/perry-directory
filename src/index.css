@@ -350,9 +350,44 @@ body {
   margin: 0 0 8px 0;
 }
 
+.public-shell-banner {
+  max-width: 1680px;
+  margin: 0 auto 20px;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--deep);
+  border-radius: 6px;
+  background: var(--accent-soft);
+  color: var(--deep);
+  font-size: 14px;
+}
+
 .page-sub {
   color: var(--muted);
   margin: 0 0 20px 0;
+}
+
+.upgrade-path {
+  margin-top: 28px;
+}
+
+.upgrade-path-title {
+  font-size: 18px;
+  margin: 0 0 12px 0;
+}
+
+.upgrade-path-steps {
+  margin: 0 0 12px 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.upgrade-path-note {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0;
 }
 
 .back-link {
@@ -769,6 +804,67 @@ body {
   margin-top: 16px;
 }
 
+/* Paid-tier call-to-action buttons (Featured / Premium). Call now is the
+   azure primary; Visit website is a pale secondary. Both are real actions
+   (phone, website), never a fake checkout. */
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+/* Paid-tier fuller profile: photo gallery + social links. Dormant until an
+   owner supplies data. */
+.featured-profile {
+  margin: 16px 0;
+}
+
+.featured-profile-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+
+.featured-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.featured-gallery img {
+  width: 140px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--accent-soft);
+}
+
+.featured-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.featured-link {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  border: 1px solid var(--line);
+  color: var(--deep);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+}
+
+.featured-link:hover {
+  background: var(--pale);
+}
+
 .report-note {
   display: flex;
   align-items: flex-start;
@@ -871,6 +967,12 @@ body {
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
+}
+
+.btn-secondary {
+  background: var(--accent-soft);
+  border-color: var(--accent-soft);
+  color: var(--deep);
 }
 
 .claim-form {

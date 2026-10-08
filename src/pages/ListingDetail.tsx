@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { useListings } from '../data/useListings'
+import { PUBLIC_SHELL, useListings } from '../data/useListings'
 import { categoryBySlug } from '../data/categories'
 import { BRAND_CITY, BRAND_STATE_FULL } from '../data/brand'
 import { CopyPhone } from '../components/CopyPhone'
@@ -59,6 +59,21 @@ export function ListingDetail() {
     return (
       <div className="page">
         <h1 className="page-title">Loading listing</h1>
+      </div>
+    )
+  }
+
+  if (PUBLIC_SHELL) {
+    return (
+      <div className="page">
+        <h1 className="page-title">Listing review route</h1>
+        <p className="page-sub">
+          Business listing data is intentionally excluded from this public
+          build. The private local preview contains the listing record.
+        </p>
+        <Link className="btn btn-primary" to="/directory">
+          Back to the directory shell
+        </Link>
       </div>
     )
   }
@@ -136,6 +151,76 @@ export function ListingDetail() {
         >
           {descExpanded ? 'See less' : 'See more'}
         </button>
+      )}
+
+      {/* Featured / Premium profile + call-to-action. Both are paid-tier
+          promises (pricing.ts). The profile (photos + links) is dormant until
+          an owner supplies data; the call-to-action works from the phone and
+          website already on file. Gated on tier, not just data, so a paid
+          listing always shows the action button even before its profile is
+          filled in. */}
+      {listing.listing_tier !== 'free' && (
+        <>
+          {(listing.photos.length > 0 || listing.links.length > 0) && (
+            <div className="featured-profile">
+              {listing.photos.length > 0 && (
+                <>
+                  <p className="featured-profile-label">Photos</p>
+                  <div className="featured-gallery">
+                    {listing.photos.map((photo, i) => (
+                      <img
+                        key={i}
+                        src={import.meta.env.BASE_URL + photo.replace(/^\//, '')}
+                        alt={`${listing.business_name} photo ${i + 1}`}
+                        loading="lazy"
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+              {listing.links.length > 0 && (
+                <>
+                  <p className="featured-profile-label">Links</p>
+                  <div className="featured-links">
+                    {listing.links.map((link, i) => (
+                      <a
+                        key={i}
+                        className="featured-link"
+                        href={link.url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+          {(listing.phone || listing.website) && (
+            <div className="cta-row">
+              {listing.phone && (
+                <a
+                  className="btn btn-primary"
+                  href={`tel:+1${listing.phone.replace(/\D/g, '')}`}
+                >
+                  Call now
+                </a>
+              )}
+              {listing.website && (
+                <a
+                  className="btn btn-secondary"
+                  href={listing.website}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Visit website
+                </a>
+              )}
+            </div>
+          )}
+        </>
       )}
 
       {hasCoords(listing) && (

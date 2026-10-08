@@ -1,6 +1,12 @@
 import { useEffect, useState } from 'react'
 import type { Listing } from './listings'
 
+// The public GitHub Pages shell is built without business data. Vite replaces
+// this flag at build time, so the public bundle never needs to request or
+// carry the private listings payload. Local and staging builds leave it unset
+// and keep the normal generated JSON flow.
+export const PUBLIC_SHELL = import.meta.env.VITE_PUBLIC_SHELL === 'true'
+
 // Lazily-loaded directory data. The 278 listings (with their descriptions)
 // used to be inlined into the JS bundle as a 278-item array (~335 kB of
 // source, ~115 kB after minification), which is what pushed the bundle over
@@ -20,6 +26,10 @@ let pending: Promise<Listing[]> | null = null
 function loadListings(): Promise<Listing[]> {
   if (cache) return Promise.resolve(cache)
   if (pending) return pending
+  if (PUBLIC_SHELL) {
+    cache = []
+    return Promise.resolve(cache)
+  }
   pending = fetch(`${import.meta.env.BASE_URL}listings.json`)
     .then((res) => {
       if (!res.ok) throw new Error(`listings.json failed: ${res.status}`)

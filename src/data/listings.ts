@@ -28,6 +28,8 @@ export interface Listing {
   hours: string | null
   image: string | null
   tags: string[]
+  photos: string[]
+  links: { label: string; url: string }[]
   listing_tier: ListingTier
   claim_status: ClaimStatus
   listed_since: string
