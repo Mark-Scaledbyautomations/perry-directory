@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { PUBLIC_SHELL, useListings } from '../data/useListings'
+import { useListings } from '../data/useListings'
 import { CATEGORIES } from '../data/categories'
 import { BRAND_CITY, BRAND_STATE_FULL } from '../data/brand'
 import { ClaimMapChip } from '../components/ClaimMapChip'
@@ -12,6 +12,19 @@ import { ClaimMapChip } from '../components/ClaimMapChip'
 // brand decisions.
 // (Stats and anchors are computed inside Landing() now that listings are
 // fetched lazily via useListings() rather than imported at module scope.)
+
+const ANCHOR_SLUGS: { slug: string; label: string }[] = [
+  { slug: 'bodega-brew', label: 'Cafes and coffee' },
+  { slug: 'kidstrong-perry', label: 'Fitness' },
+  { slug: 'hoke-s-heating-air', label: 'Heating and air' },
+  { slug: 'cossart-design', label: 'Home and furniture' },
+  { slug: 'hamby-automotive-network', label: 'Auto repair' },
+  { slug: 'abba-house', label: 'Community nonprofit' },
+  { slug: 'kinetic', label: 'Marketing and media' },
+  { slug: 'air-evac-lifeteam', label: 'Medical transport' },
+]
+
+const PLATE_SLUGS = new Set(['cossart-design'])
 
 // Category tile photos (UI, 2026-09-16). Every file depicts a real Perry or
 // Houston County location in that trade, from Wikimedia Commons, all
@@ -32,58 +45,15 @@ const CAT_PHOTOS: Record<string, string> = {
 
 export function Landing() {
   const [listings] = useListings()
-  if (PUBLIC_SHELL) {
-    return (
-      <div className="landing">
-        <section className="landing-hero">
-          <h1>Perry Directory review shell</h1>
-          <p className="landing-hero-sub">
-            This public build contains the application shell only. Business
-            listing data stays in the private project and is available in the
-            local preview.
-          </p>
-          <div className="landing-hero-actions">
-            <Link className="landing-btn landing-btn-primary" to="/pricing">
-              View the pricing flow
-            </Link>
-            <Link className="landing-btn landing-btn-offer" to="/claim-help#claim-help-heading">
-              Read the owner guide
-            </Link>
-          </div>
-        </section>
-        <section className="landing-section" aria-labelledby="shell-categories-heading">
-          <h2 id="shell-categories-heading">Directory shell routes</h2>
-          <p className="landing-section-sub">
-            Category and listing routes remain available for local review, but
-            this public build does not include their business records.
-          </p>
-          <ul className="landing-category-grid">
-            {CATEGORIES.map((c) => (
-              <li key={c.slug}>
-                <Link className="landing-cat-tile" to={`/category/${c.slug}`}>
-                  <span className="landing-cat-body">
-                    <span className="landing-cat-name">{c.name}</span>
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
-    )
-  }
   const totalListings = listings.length
   const photosCount = listings.filter((l) => l.image).length
   const categoryCount = CATEGORIES.length
-  const anchors = listings
-    .filter((l) => l.image)
-    .slice(0, 8)
-    .map((l) => ({
-      slug: l.slug,
-      name: l.business_name,
-      image: l.image as string,
-      label: CATEGORIES.find((c) => c.slug === l.category_slug)?.name ?? 'Local business',
-    }))
+  const anchors = ANCHOR_SLUGS.flatMap((a) => {
+    const l = listings.find((x) => x.slug === a.slug)
+    return l && l.image
+      ? [{ slug: l.slug, name: l.business_name, image: l.image, label: a.label }]
+      : []
+  })
 
   return (
     <div className="landing">
@@ -184,7 +154,7 @@ export function Landing() {
             <li key={a.slug}>
               <Link className="landing-biz-tile" to={`/listing/${a.slug}`}>
                 <span
-                  className="landing-biz-logo"
+                  className={"landing-biz-logo" + (PLATE_SLUGS.has(a.slug) ? " landing-biz-logo--plate" : "")}
                 >
                   <img
                     src={import.meta.env.BASE_URL + a.image.replace(/^\//, '')}

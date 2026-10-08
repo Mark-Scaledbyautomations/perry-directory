@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { PUBLIC_SHELL, useListings } from '../data/useListings'
+import { useListings } from '../data/useListings'
 import { categoryBySlug } from '../data/categories'
 import { SearchBar } from '../components/SearchBar'
 import { CategoryFilter } from '../components/CategoryFilter'
@@ -68,21 +68,6 @@ export function Home() {
   const isAdmin = isAdminMode(searchParams)
   const [query, setQuery] = useState('')
   const [listings] = useListings()
-
-  if (PUBLIC_SHELL) {
-    return (
-      <div className="page">
-        <h1 className="page-title">Directory review shell</h1>
-        <p className="page-sub">
-          Business listing data is intentionally excluded from this public
-          build. Use the private local preview to review the directory records.
-        </p>
-        <Link className="btn btn-primary" to="/pricing">
-          View the pricing flow
-        </Link>
-      </div>
-    )
-  }
 
   // URL-driven filter helpers. The update reads window.location.search at the
   // moment of the change, not the `searchParams` snapshot captured at render.

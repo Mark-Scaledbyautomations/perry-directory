@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { PUBLIC_SHELL, useListings } from '../data/useListings'
+import { useListings } from '../data/useListings'
 import { categoryBySlug } from '../data/categories'
 import { BRAND_CITY, BRAND_STATE_FULL } from '../data/brand'
 import { CopyPhone } from '../components/CopyPhone'
@@ -59,21 +59,6 @@ export function ListingDetail() {
     return (
       <div className="page">
         <h1 className="page-title">Loading listing</h1>
-      </div>
-    )
-  }
-
-  if (PUBLIC_SHELL) {
-    return (
-      <div className="page">
-        <h1 className="page-title">Listing review route</h1>
-        <p className="page-sub">
-          Business listing data is intentionally excluded from this public
-          build. The private local preview contains the listing record.
-        </p>
-        <Link className="btn btn-primary" to="/directory">
-          Back to the directory shell
-        </Link>
       </div>
     )
   }

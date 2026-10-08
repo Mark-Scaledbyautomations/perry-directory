@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { PUBLIC_SHELL, useListings } from '../data/useListings'
+import { useListings } from '../data/useListings'
 import { ConsentCheckbox, type ConsentState } from '../components/ConsentCheckbox'
 import { PhotoUpload, type PhotoUploadState } from '../components/PhotoUpload'
 import {
@@ -37,21 +37,6 @@ export function Claim() {
     return (
       <div className="page">
         <h1 className="page-title">Loading listing</h1>
-      </div>
-    )
-  }
-
-  if (PUBLIC_SHELL) {
-    return (
-      <div className="page">
-        <h1 className="page-title">Claim review route</h1>
-        <p className="page-sub">
-          Business listing data is intentionally excluded from this public
-          build. The private local preview contains the claim flow record.
-        </p>
-        <Link className="btn btn-primary" to="/claim-help">
-          Read the owner guide
-        </Link>
       </div>
     )
   }

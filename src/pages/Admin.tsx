@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { PUBLIC_SHELL, useListings } from '../data/useListings'
+import { useListings } from '../data/useListings'
 import type { Listing } from '../data/listings'
 import { CATEGORIES } from '../data/categories'
 import { isAdminMode, SCOPE_LABEL, WEBSITE_STATUS_LABEL } from '../components/ListingCard'
@@ -35,21 +35,6 @@ export function Admin() {
   const [searchParams] = useSearchParams()
   const isAdmin = isAdminMode(searchParams)
   const [listings] = useListings()
-
-  if (PUBLIC_SHELL) {
-    return (
-      <div className="page">
-        <h1 className="page-title">Review dashboard shell</h1>
-        <p className="page-sub">
-          The public build excludes the private directory dataset. The review
-          dashboard is available in the local preview only.
-        </p>
-        <Link className="btn btn-primary" to="/pricing">
-          View the pricing flow
-        </Link>
-      </div>
-    )
-  }
 
   // This page owns its title (paired with the RouteTitleSync skip in App.tsx)
   useEffect(() => {
